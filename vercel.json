@@ -1,5 +1,6 @@
 {
   "framework": null,
+  "installCommand": "npm ci && npm --prefix fallback-app ci --include=dev",
   "buildCommand": "npm run build",
   "rewrites": [
     { "source": "/quick-links/(.*)", "destination": "/quick-links/index.html" },
