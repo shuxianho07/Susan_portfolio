@@ -21,7 +21,7 @@ export default function Resume() {
               Inspect the embedded dossier below, or extract a copy for offline archives.
             </p>
             <a
-              href="resume.pdf"
+              href={`${import.meta.env.BASE_URL}resume.pdf`}
               target="_blank"
               rel="noreferrer"
               className="inline-flex items-center justify-center gap-2 px-6 py-2.5 text-xs font-['Cinzel'] font-bold uppercase tracking-widest text-hogwarts-bg bg-hogwarts-gold hover:opacity-80 shadow-[0_0_10px_rgba(var(--hogwarts-gold-rgb),0.3)] hover:shadow-[0_0_20px_rgba(var(--hogwarts-gold-rgb),0.6)] transition-all rounded-sm hover:-translate-y-0.5"
@@ -31,10 +31,9 @@ export default function Resume() {
           </div>
 
           <div className="mt-6 border border-hogwarts-gold/40 rounded-sm overflow-hidden shadow-[0_0_15px_rgba(var(--hogwarts-gold-rgb),0.1)] relative">
-            {/* The relative path resume.pdf ensures it works in HashRouter and resolves to /quick-links/resume.pdf */}
             <iframe
               title="Resume"
-              src="resume.pdf"
+              src={`${import.meta.env.BASE_URL}resume.pdf`}
               className="w-full min-h-[72vh] max-h-[90vh] bg-hogwarts-parchment"
             />
           </div>
@@ -44,7 +43,7 @@ export default function Resume() {
           <div className="bg-hogwarts-castle border border-hogwarts-gold/20 p-6 rounded-sm text-center">
             <p className="mb-4 text-hogwarts-parchment/80 font-['Outfit']">Acquire a physical copy:</p>
             <a
-              href="resume.pdf"
+              href={`${import.meta.env.BASE_URL}resume.pdf`}
               download
               className="inline-flex items-center justify-center gap-2 px-6 py-2.5 text-xs font-['Cinzel'] font-bold uppercase tracking-widest text-hogwarts-gold border border-hogwarts-gold bg-transparent hover:bg-hogwarts-gold/10 transition-all rounded-sm hover:-translate-y-0.5"
             >

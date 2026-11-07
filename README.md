@@ -151,24 +151,36 @@ The entire game engine is hand-rolled — no libraries, no build tools. All spri
 
 ##  Running Locally
 
-No build step required. Just open the file in a browser:
+Prerequisites: Node.js with npm, plus Python 3 for the static game server.
 
 ```bash
-# Clone the repo
-git clone https://github.com/shuxianho07/welcome-to-hogwarts.git
-cd welcome-to-hogwarts
+# Install the React portfolio dependencies using the committed lockfile.
+npm --prefix fallback-app ci --include=dev
 
-# Open in browser (any of the following)
-# Option 1: Double-click index.html
-# Option 2: Use a local dev server (recommended to avoid CORS issues with assets)
-npx http-server -p 8000
-# or
-python -m http.server 8000
-# or
-npx serve .
+# Build the traditional portfolio into quick-links/.
+npm run build
+
+# Serve the game and the built portfolio from the repository root.
+python3 -m http.server 8000
 ```
 
-> **Note:** Opening `index.html` directly with `file://` may block sprite loading in some browsers due to CORS restrictions. Using a local server is recommended.
+For React development with hot reload and direct subroute support, run this in another terminal:
+
+```bash
+npm --prefix fallback-app run dev -- --host 0.0.0.0 --port 5173 --strictPort
+```
+
+The game runs on port 8000; the React development app uses `/quick-links/` on port 5173. Python's static server does not implement the Vercel rewrite rules, so use Vite for direct React subroutes. Both services are needed when moving between the game and the React development app; the built app on port 8000 links back to the game directly.
+
+```bash
+# Validate the chat handler without credentials or external API calls.
+npm test
+```
+
+First-time visitors receive a skippable interactive walkthrough: move, jump, enter the castle, open a glowing object, close its archive, and open the field guide. Steps advance only after the visitor performs each action; the game stays playable throughout. The field guide can replay it and tracks the four portfolio sections locally in the browser. The Common Room is an interactive study: its desk, library, and maps open portfolio archives.
+
+The optional live chatbot needs a Vercel-compatible runtime, a server-side `GEMINI_API_KEY`, and access to `generativelanguage.googleapis.com`. The local frontend falls back to answers derived from repository content when the API is unavailable. Do not put API keys in frontend files.
+
 
 ---
 

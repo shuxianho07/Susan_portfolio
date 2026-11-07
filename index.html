@@ -15,6 +15,8 @@
     <link rel="stylesheet" href="css/overlays.css?v=3">
     <link rel="stylesheet" href="css/containers.css?v=3">
     <link rel="stylesheet" href="css/projects.css?v=3">
+    <link rel="stylesheet" href="css/archives.css?v=1">
+    <link rel="stylesheet" href="css/walkthrough.css?v=1">
     <link
         href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@400;700&family=Cinzel:wght@400;600;700&family=Outfit:wght@300;400;600&family=Caveat:wght@400..700&family=Patrick+Hand&display=swap"
         rel="stylesheet">
@@ -55,9 +57,9 @@
         </div>
         <div class="nav-socials">
             <button id="theme-toggle" class="nav-btn" title="Toggle Light/Dark Theme">Nox</button>
-            <a href="mailto:s39ho@uwaterloo.ca" target="_blank" title="Email" onclick="va('event', 'click_social', { type: 'Email' })"><i class="fas fa-envelope"></i></a>
-            <a href="https://www.linkedin.com/in/shuxian-susan-ho/" target="_blank" title="LinkedIn" onclick="va('event', 'click_social', { type: 'LinkedIn' })"><i class="fab fa-linkedin"></i></a>
-            <a href="https://github.com/shuxianho07" target="_blank" title="GitHub" onclick="va('event', 'click_social', { type: 'GitHub' })"><i class="fab fa-github"></i></a>
+            <a href="mailto:s39ho@uwaterloo.ca" target="_blank" title="Email" onclick="if (window.va) va('event', 'click_social', { type: 'Email' })"><i class="fas fa-envelope"></i></a>
+            <a href="https://www.linkedin.com/in/shuxian-susan-ho/" target="_blank" title="LinkedIn" onclick="if (window.va) va('event', 'click_social', { type: 'LinkedIn' })"><i class="fab fa-linkedin"></i></a>
+            <a href="https://github.com/shuxianho07" target="_blank" title="GitHub" onclick="if (window.va) va('event', 'click_social', { type: 'GitHub' })"><i class="fab fa-github"></i></a>
         </div>
     </nav>
 
@@ -75,7 +77,7 @@
     </div>
 
     <!-- ===== GAME CONTAINER ===== -->
-    <div id="game" class="hidden">
+    <div id="game" class="hidden" tabindex="-1" aria-label="Interactive Hogwarts portfolio">
 
         <!-- World layer: background + character -->
         <div id="world">
@@ -103,8 +105,41 @@
             <div id="movement-instructions" class="hidden">Use WASD or Arrow Keys to move • Space to jump</div>
         </div>
 
+        <details id="explorer-guide">
+            <summary><span id="explorer-location">Castle Grounds</span><span id="explorer-count" aria-live="polite">0 / 4 discovered</span></summary>
+            <div class="explorer-panel">
+                <h2>Explorer’s Field Guide</h2>
+                <p id="explorer-objective">Walk right to the castle door to begin.</p>
+                <div class="explorer-pages">
+                    <button type="button" data-discover="skills"><span class="discovery-status" aria-hidden="true">○</span> Skills & Spells</button>
+                    <button type="button" data-discover="experience"><span class="discovery-status" aria-hidden="true">○</span> Experience</button>
+                    <button type="button" data-discover="projects"><span class="discovery-status" aria-hidden="true">○</span> Projects</button>
+                    <button type="button" data-discover="about"><span class="discovery-status" aria-hidden="true">○</span> About Susan</button>
+                </div>
+                <p class="explorer-controls">Move: A / D or ← / → · Jump: W / ↑ / Space<br>Interact: E / Enter · Close: Esc<br>On mobile, use the arrow buttons and tap glowing objects.</p>
+                <button type="button" id="tutorial-replay">Replay tutorial</button>
+                <a href="/quick-links/">Prefer a traditional portfolio? Open quick links →</a>
+            </div>
+        </details>
+
         <!-- Fade overlay for transitions -->
         <div id="fade"></div>
+
+        <!-- This guide observes real actions while leaving the game playable. -->
+        <div id="walkthrough-target" hidden aria-hidden="true"><span>↓</span></div>
+        <aside id="walkthrough" hidden aria-label="Interactive walkthrough">
+            <div class="walkthrough-header">
+                <span id="walkthrough-progress">LEARN BY EXPLORING · 1 / 6</span>
+                <button type="button" id="walkthrough-skip" aria-label="Skip walkthrough">Skip ×</button>
+            </div>
+            <div id="walkthrough-announcement" aria-live="polite" aria-atomic="true">
+                <h2 id="walkthrough-title"></h2>
+                <p id="walkthrough-cue"></p>
+            </div>
+            <div id="walkthrough-keys" aria-hidden="true"></div>
+            <div id="walkthrough-dots" aria-hidden="true"></div>
+            <button type="button" id="walkthrough-finish" hidden>Explore freely →</button>
+        </aside>
 
         <!-- Portfolio overlays -->
         <div id="overlay-skills" class="overlay hidden">
@@ -324,16 +359,18 @@
     <!-- Touch controls (mobile) -->
     <div id="touch-controls" class="hidden">
         <div class="touch-left-cluster">
-            <button class="touch-btn" data-key="left">←</button>
-            <button class="touch-btn" data-key="right">→</button>
+            <button class="touch-btn" data-key="left" aria-label="Move left">←</button>
+            <button class="touch-btn" data-key="right" aria-label="Move right">→</button>
         </div>
-        <button class="touch-btn touch-jump" data-key="up">↑</button>
+        <button class="touch-btn touch-jump" data-key="up" aria-label="Jump">↑</button>
     </div>
     <!-- Modular Game Engine Logic -->
-    <script src="js/setup.js?v=3"></script>
+    <script src="js/setup.js?v=4"></script>
     <script src="js/scene.js?v=3"></script>
-    <script src="js/input.js?v=3"></script>
-    <script src="js/main.js?v=3"></script>
+    <script src="js/input.js?v=4"></script>
+    <script src="js/explorer.js?v=2"></script>
+    <script src="js/walkthrough.js?v=1"></script>
+    <script src="js/main.js?v=4"></script>
 </body>
 
 </html>

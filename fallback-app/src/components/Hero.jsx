@@ -1,5 +1,4 @@
-import { motion, useScroll, useTransform } from 'framer-motion';
-import { useRef } from 'react';
+import { motion } from 'framer-motion';
 import {
   FaBriefcase,
   FaChartLine,
@@ -9,37 +8,27 @@ import {
   FaGithub,
   FaProjectDiagram,
   FaRobot,
-  FaTools,
-  FaChevronDown
+  FaTools
 } from 'react-icons/fa';
 import { experienceHighlights } from '../data/experience';
 
 export default function Hero({ onNavigate }) {
   const stats = experienceHighlights;
-  const containerRef = useRef(null);
-  const { scrollYProgress } = useScroll({
-    target: containerRef,
-    offset: ["start start", "end start"]
-  });
-
-  const y = useTransform(scrollYProgress, [0, 1], ["0%", "50%"]);
-  const opacity = useTransform(scrollYProgress, [0, 0.6], [1, 0]);
-
   const experienceSpotlights = [
-    'AI automation and full-stack internal tools',
-    'ETL pipelines, knowledge bases, and semantic search',
-    '50+ users, 10k+ records, and 500+ documents'
+    'Full-stack platforms and backend APIs',
+    'ETL pipelines, analytics, and financial reporting',
+    '60K+ global users and dashboards for 50+ stakeholders'
   ];
 
   const proofCards = [
     {
-      title: 'AI Infrastructure',
-      description: 'RAG, vector search, paper ingestion, LLM reasoning, and grounded knowledge workflows.',
+      title: 'Machine Learning',
+      description: 'Predictive modeling, Random Forest, ONNX, and automated model retraining.',
       icon: <FaRobot className="h-6 w-6" />
     },
     {
-      title: 'Quant & Optimization',
-      description: 'Backtesting, market data, portfolio accounting, execution costs, and allocation logic.',
+      title: 'Financial Analytics',
+      description: 'Market data analysis, volume signals, financial reporting, and business intelligence.',
       icon: <FaChartLine className="h-6 w-6" />
     },
     {
@@ -77,7 +66,7 @@ export default function Hero({ onNavigate }) {
   ];
 
   return (
-    <div ref={containerRef} className="relative pb-24 w-full">
+    <div className="relative pb-24 w-full">
       
       {/* CLEAN BACKGROUND */}
       <motion.div 
@@ -91,7 +80,7 @@ export default function Hero({ onNavigate }) {
       </motion.div>
 
       {/* 1. CINEMATIC HERO HEADER */}
-      <section className="relative min-h-[80vh] flex flex-col items-center justify-center pt-32 lg:pt-40 pb-10 overflow-visible">
+      <section className="relative min-h-[65vh] flex flex-col items-center justify-center pt-12 sm:pt-20 lg:pt-28 pb-10 overflow-visible">
         
         {/* Floating Title Content */}
         <motion.div
@@ -201,7 +190,7 @@ export default function Hero({ onNavigate }) {
           <div className="h-[1px] flex-1 bg-hogwarts-gold/30"></div>
         </div>
         
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+        <div className="grid grid-cols-1 min-[380px]:grid-cols-2 md:grid-cols-4 gap-4">
           {navCards.map((card, idx) => (
             <motion.button
               key={card.title}

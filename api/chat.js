@@ -4,19 +4,22 @@ module.exports = async function handler(req, res) {
     return res.status(405).json({ error: 'Method Not Allowed' });
   }
 
-  const { messages } = req.body;
+  const { messages } = req.body || {};
   const apiKey = process.env.GEMINI_API_KEY;
 
-  if (!apiKey) {
-    return res.status(500).json({ error: 'GEMINI_API_KEY is not set in environment variables.' });
-  }
-
-  if (!messages || !Array.isArray(messages)) {
+  if (!Array.isArray(messages) || messages.length === 0 || messages.length > 20 ||
+      messages.some(msg => !msg || !['user', 'assistant'].includes(msg.role) ||
+        typeof msg.text !== 'string' || !msg.text.trim() || msg.text.length > 2000) ||
+      messages[messages.length - 1].role !== 'user') {
     return res.status(400).json({ error: 'Invalid messages format.' });
   }
 
+  if (!apiKey) {
+    return res.status(503).json({ error: 'The assistant is temporarily unavailable.' });
+  }
+
   try {
-    const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`;
+    const url = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent';
 
     const systemInstruction = `You are the interactive portfolio assistant for Susan Ho.
 Susan is a Data Analyst & Backend Engineer studying Honours Math & Financial Analysis at the University of Waterloo.
@@ -61,13 +64,12 @@ Rules:
 
     const response = await fetch(url, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: { 'Content-Type': 'application/json', 'x-goog-api-key': apiKey },
+      signal: AbortSignal.timeout(10000),
       body: JSON.stringify(body)
     });
 
     if (!response.ok) {
-      const errorText = await response.text();
-      console.error('Gemini API Error Response:', errorText);
       throw new Error(`API returned ${response.status}`);
     }
 
@@ -77,7 +79,7 @@ Rules:
     return res.status(200).json({ reply });
 
   } catch (error) {
-    console.error('Chat API Error:', error);
-    return res.status(500).json({ error: 'Failed to generate response.' });
+    console.error('Chat API Error:', error.name);
+    return res.status(502).json({ error: 'Failed to generate response.' });
   }
 }

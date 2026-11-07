@@ -6,16 +6,28 @@ function viewportSize() {
 
 function getGroundY() {
     if (scene === 'outside') return worldH - CONFIG.physics.groundOffsetOutside;
-    if (scene === 'commonRoom') return worldH - CONFIG.physics.groundOffsetCommonRoom;
+    if (scene === 'commonRoom') return worldH * 0.91;
     return worldH - CONFIG.physics.groundOffsetInside;
 }
 
 function setupScene(sceneName) {
     scene = sceneName;
+    clearMovement();
+    updateCharacterDimensions();
+    const roomHeight = Math.min(500, Math.max(220, window.innerHeight * 0.5));
+    if (sceneName === 'commonRoom') {
+        CONFIG.character.height = roomHeight;
+        CONFIG.character.width = roomHeight * 268 / 509;
+        charEl.style.height = roomHeight + 'px';
+        charEl.style.width = CONFIG.character.width + 'px';
+    } else {
+        charEl.style.height = '';
+        charEl.style.width = '';
+    }
     const { w, h } = viewportSize();
 
     // Clear existing world decorations
-    worldEl.querySelectorAll('.hotspot-marker, .door-marker, .ground-outside, .ground-inside, .torch, .castle-decor, .greeting-text, .instruction-text, .common-room-door-btn').forEach(el => el.remove());
+    worldEl.querySelectorAll('.hotspot-marker, .door-marker, .ground-outside, .ground-inside, .ground-commonroom, .torch, .castle-decor, .greeting-text, .instruction-text, .common-room-door-btn').forEach(el => el.remove());
 
     if (sceneName === 'outside') {
         worldW = Math.max(w, h * 1.77); // Ensure it fills the screen width at minimum
@@ -80,7 +92,8 @@ function setupScene(sceneName) {
         addInsideDecorations();
 
         // Add a visible Common Room door button on the far right
-        const commonRoomBtn = document.createElement('div');
+        const commonRoomBtn = document.createElement('button');
+        commonRoomBtn.type = 'button';
         commonRoomBtn.className = 'common-room-door-btn';
         commonRoomBtn.innerHTML = `🚪 Common Room`;
         commonRoomBtn.style.right = '0px';
@@ -97,7 +110,9 @@ function setupScene(sceneName) {
         interactBtn.classList.add('inside-scene');
 
         CONFIG.inside.hotspots.forEach(hs => {
-            const marker = document.createElement('div');
+            const marker = document.createElement('button');
+            marker.type = 'button';
+            marker.setAttribute('aria-label', hs.label);
             marker.className = 'hotspot-marker';
             marker.dataset.id = hs.id;
 
@@ -139,7 +154,7 @@ function setupScene(sceneName) {
     } else if (sceneName == 'commonRoom') {
         const {w, h} = viewportSize();
         worldH = h;
-        worldW = w * CONFIG.commonRoom.widthMultiplier;
+        worldW = Math.max(w, h * 2752 / 1536);
 
         bgEl.className = 'scene-common-room';
         applyTheme(themeMode);
@@ -155,7 +170,9 @@ function setupScene(sceneName) {
 
         // Add Common Room hotspot markers (upstairs, sit, window)
         CONFIG.commonRoom.hotspots.forEach(hs => {
-            const marker = document.createElement('div');
+            const marker = document.createElement('button');
+            marker.type = 'button';
+            marker.setAttribute('aria-label', hs.label);
             marker.className = 'hotspot-marker';
             marker.dataset.id = hs.id;
 
@@ -166,12 +183,12 @@ function setupScene(sceneName) {
             marker.style.top  = hsY + 'px';
 
             marker.innerHTML = `
-                <span class="hotspot-icon">${hs.emoji}</span>
+                <span class="room-marker-number">${hs.glyph}</span>
                 <span class="hotspot-label">${hs.label}</span>
             `;
 
             marker.addEventListener('click', () => {
-                if (!overlayOpen) showChat(hs.chat, 3000);
+                if (!overlayOpen && !sceneTransitioning) openOverlay(hs.overlay);
             });
 
             worldEl.appendChild(marker);
@@ -184,8 +201,8 @@ function setupScene(sceneName) {
         backButton.classList.remove('hidden');
         backButton.textContent = '⬅ Back';
 
-        // Hide interact button — hotspot markers handle interaction
-        interactBtn.classList.add('inside-scene');
+        // Common Room hotspots support both keyboard and touch interaction.
+        interactBtn.classList.remove('inside-scene');
 
         // Spawn character
         charX = (CONFIG.character.spawnCommonRoom.xPct / 100) * worldW;
@@ -207,6 +224,7 @@ function setupScene(sceneName) {
 
     placeCharacter();
     centerCamera();
+    if (typeof updateExplorer === 'function') updateExplorer();
 }
 
 function addOutsideDecorations() {
@@ -237,26 +255,10 @@ function placeCharacter() {
     charEl.style.left = charX + 'px';
     charEl.style.top = charY + 'px';
 
-    if (scene === 'commonRoom') {
-        // 2.5D: scale character based on Y depth (top = far = small, bottom = near = large)
-        const minY = worldH * 0.4;
-        const maxY = worldH * 0.85;
-        // Use the ground level for depth, so jumping (which changes charY) doesn't shrink the character
-        const floorY = getGroundY();
-        const depth = clamp((floorY - minY) / (maxY - minY), 0, 1); // 0 = far, 1 = near
-        const depthScale = 0.55 + depth * 0.45; // ranges from 55% to 100%
+    // One scale only: the room character uses the same floor plane as the furniture.
+    charEl.style.transform = '';
+    charEl.style.zIndex = '';
 
-        // Screen proportionality: scale character with viewport size (900px = reference size)
-        const screenScale = worldH / 900;
-
-        const totalScale = depthScale * screenScale;
-        const facing = charEl.style.getPropertyValue('--facing') || '1';
-        charEl.style.transform = `translate(-50%, -100%) scaleX(${facing}) scale(${totalScale})`;
-        charEl.style.zIndex = Math.floor(charY); // depth sorting
-    } else {
-        charEl.style.transform = ''; // reset for other scenes
-        charEl.style.zIndex = '';
-    }
 }
 
 function centerCamera() {

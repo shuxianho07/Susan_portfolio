@@ -1,5 +1,5 @@
 import { motion } from 'framer-motion';
-import { useMemo, useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { FaMagic, FaPaperPlane, FaRobot } from 'react-icons/fa';
 import { experiences } from '../data/experience';
 import { projects } from '../data/projects';
@@ -68,7 +68,9 @@ export default function PortfolioAssistant() {
   const [open, setOpen] = useState(false);
   const [input, setInput] = useState('');
   const [size, setSize] = useState({ width: 360, height: 520 });
-  const dragRef = useRef(null);
+  const inputRef = useRef(null);
+  const launcherRef = useRef(null);
+  const logRef = useRef(null);
   const [messages, setMessages] = useState([
     {
       role: 'assistant',
@@ -91,7 +93,8 @@ export default function PortfolioAssistant() {
       const response = await fetch('/api/chat', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ messages: newMessages })
+        body: JSON.stringify({ messages: newMessages.slice(-20).map(message => ({ ...message, text: message.text.slice(0, 2000) })) }),
+        signal: AbortSignal.timeout(12000)
       });
 
       if (!response.ok) {
@@ -99,6 +102,7 @@ export default function PortfolioAssistant() {
       }
 
       const data = await response.json();
+      if (typeof data.reply !== 'string' || !data.reply.trim()) throw new Error('Empty reply');
       setMessages(prev => [...prev, { role: 'assistant', text: data.reply }]);
     } catch (error) {
       console.warn('API unavailable, falling back to local response.', error);
@@ -109,13 +113,24 @@ export default function PortfolioAssistant() {
     }
   };
 
-  const suggestions = useMemo(() => sampleQuestions, []);
+  const closeChat = () => {
+    setOpen(false);
+    requestAnimationFrame(() => launcherRef.current?.focus());
+  };
+
+  useEffect(() => {
+    if (open) inputRef.current?.focus();
+  }, [open]);
+
+  useEffect(() => {
+    if (logRef.current) logRef.current.scrollTop = logRef.current.scrollHeight;
+  }, [messages, isLoading, open]);
 
   useEffect(() => {
     const clampSize = () => {
       setSize((prev) => ({
-        width: Math.min(prev.width, Math.max(320, window.innerWidth - 16)),
-        height: Math.min(prev.height, Math.max(380, window.innerHeight - 16))
+        width: Math.min(prev.width, Math.max(0, window.innerWidth - 32)),
+        height: Math.min(prev.height, Math.max(0, window.innerHeight - 32))
       }));
     };
 
@@ -124,17 +139,13 @@ export default function PortfolioAssistant() {
     return () => window.removeEventListener('resize', clampSize);
   }, []);
 
-  const handleResize = (event) => {
-    if (!dragRef.current) return;
-    const nextWidth = Math.min(420, Math.max(320, window.innerWidth - event.clientX - 16));
-    const nextHeight = Math.min(700, Math.max(380, window.innerHeight - event.clientY - 16));
-    setSize({ width: nextWidth, height: nextHeight });
-  };
-
   return (
     <div className="fixed bottom-4 right-4 z-50">
       {!open ? (
         <motion.button
+          ref={launcherRef}
+          aria-expanded={open}
+          aria-controls="portfolio-chat"
           initial={{ opacity: 0, y: 12 }}
           animate={{ opacity: 1, y: 0 }}
           whileHover={{ scale: 1.02 }}
@@ -148,14 +159,23 @@ export default function PortfolioAssistant() {
         </motion.button>
       ) : (
         <motion.section
+          id="portfolio-chat"
+          role="region"
+          aria-label="Portfolio chat"
+          onKeyDown={event => {
+            if (event.key === 'Escape') {
+              event.stopPropagation();
+              closeChat();
+            }
+          }}
           initial={{ opacity: 0, y: 16, scale: 0.97 }}
           animate={{ opacity: 1, y: 0, scale: 1 }}
           exit={{ opacity: 0, y: 12, scale: 0.97 }}
           transition={{ duration: 0.18, ease: 'easeOut' }}
-          className="box-border flex max-w-[calc(100vw-16px)] max-h-[calc(100vh-16px)] flex-col overflow-hidden rounded-2xl border border-hogwarts-gold/30 bg-hogwarts-castle/95 p-3 shadow-xl shadow-black/35 backdrop-blur-md"
+          className="box-border flex max-w-[calc(100vw-32px)] max-h-[calc(100dvh-32px)] flex-col overflow-hidden rounded-2xl border border-hogwarts-gold/30 bg-hogwarts-castle/95 p-3 shadow-xl shadow-black/35 backdrop-blur-md"
           style={{
-            width: Math.min(size.width, Math.max(320, window.innerWidth - 16)),
-            height: Math.min(size.height, Math.max(380, window.innerHeight - 16))
+            width: Math.min(size.width, Math.max(0, window.innerWidth - 32)),
+            height: Math.min(size.height, Math.max(0, window.innerHeight - 32))
           }}
         >
           <div className="flex items-center justify-between gap-3 mb-2">
@@ -169,7 +189,7 @@ export default function PortfolioAssistant() {
               </div>
             </div>
             <button
-              onClick={() => setOpen(false)}
+              onClick={closeChat}
               className="rounded-full border border-hogwarts-gold/20 px-2.5 py-1 text-[10px] uppercase tracking-[0.18em] text-hogwarts-parchment/90 hover:bg-hogwarts-gold/10"
             >
               Close
@@ -181,9 +201,9 @@ export default function PortfolioAssistant() {
           </p>
 
           <div className="flex flex-col flex-1 overflow-hidden rounded-xl border border-hogwarts-gold/20 bg-black/20 p-3">
-            <label className="text-[10px] uppercase tracking-[0.2em] text-hogwarts-gold font-['Cinzel']">Portfolio chat</label>
+            <label htmlFor="portfolio-question" className="text-[10px] uppercase tracking-[0.2em] text-hogwarts-gold font-['Cinzel']">Your question</label>
 
-            <div className="mt-3 flex flex-1 flex-col gap-2 overflow-y-auto rounded-xl border border-hogwarts-gold/15 bg-hogwarts-bg/60 p-2">
+            <div ref={logRef} role="log" aria-live="polite" aria-relevant="additions" aria-label="Conversation" className="mt-3 min-h-0 flex flex-1 flex-col gap-2 overflow-y-auto rounded-xl border border-hogwarts-gold/15 bg-hogwarts-bg/60 p-2">
               {messages.map((message, index) => (
                 <div
                   key={`${message.role}-${index}`}
@@ -207,16 +227,20 @@ export default function PortfolioAssistant() {
 
             <div className="mt-3 flex gap-2">
               <input
+                ref={inputRef}
+                id="portfolio-question"
+                maxLength={2000}
                 type="text"
                 value={input}
                 onChange={(e) => setInput(e.target.value)}
-                onKeyDown={(e) => e.key === 'Enter' && handleAsk()}
+                onKeyDown={(e) => e.key === 'Enter' && !e.nativeEvent.isComposing && handleAsk()}
                 placeholder="Try: What projects are in your portfolio?"
-                className="flex-1 rounded-lg border border-hogwarts-gold/25 bg-hogwarts-bg/80 px-3 py-2 text-xs text-hogwarts-parchment outline-none ring-1 ring-transparent placeholder:text-hogwarts-parchment/50 focus:ring-hogwarts-gold/40"
+                className="min-w-0 flex-1 rounded-lg border border-hogwarts-gold/25 bg-hogwarts-bg/80 px-3 py-2 text-xs text-hogwarts-parchment outline-none ring-1 ring-transparent placeholder:text-hogwarts-parchment/50 focus:ring-hogwarts-gold/40"
               />
               <button
                 onClick={handleAsk}
-                className="inline-flex items-center gap-1 rounded-lg bg-hogwarts-gold px-3 py-2 text-[10px] font-bold uppercase tracking-[0.18em] text-hogwarts-bg transition hover:scale-[1.02]"
+                disabled={isLoading || !input.trim()}
+                className="inline-flex items-center gap-1 rounded-lg bg-hogwarts-gold px-3 py-2 text-[10px] font-bold uppercase tracking-[0.18em] text-hogwarts-bg transition hover:scale-[1.02] disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 <FaPaperPlane /> Send
               </button>
@@ -230,10 +254,10 @@ export default function PortfolioAssistant() {
               <span className="text-[10px] uppercase tracking-[0.2em] font-['Cinzel']">Quick prompts</span>
             </div>
             <div className="flex flex-wrap gap-2">
-              {suggestions.map((item) => (
+              {sampleQuestions.map((item) => (
                 <button
                   key={item}
-                  onClick={() => setInput(item)}
+                  onClick={() => { setInput(item); inputRef.current?.focus(); }}
                   className="rounded-full border border-hogwarts-gold/30 bg-hogwarts-gold/8 px-2.5 py-1.5 text-[10px] text-hogwarts-parchment/90 transition hover:border-hogwarts-gold hover:bg-hogwarts-gold/10"
                 >
                   {item}
@@ -241,16 +265,6 @@ export default function PortfolioAssistant() {
               ))}
             </div>
           </div>
-          <div
-            ref={dragRef}
-            onMouseDown={(event) => {
-              event.preventDefault();
-              window.addEventListener('mousemove', handleResize);
-              window.addEventListener('mouseup', () => window.removeEventListener('mousemove', handleResize), { once: true });
-            }}
-            className="mt-2 h-3 cursor-nwse-resize rounded-full bg-hogwarts-gold/15 hover:bg-hogwarts-gold/30"
-            title="Drag to resize"
-          />
         </motion.section>
       )}
     </div>

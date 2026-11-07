@@ -98,17 +98,16 @@ button.nav-link {
     cursor: pointer;
     transition: transform var(--transition-fast);
     z-index: 8;
-    animation: float 2s ease-in-out infinite;
+    animation: none;
 }
 
 #interact:hover {
     transform: translateY(-3px);
 }
 
-/* Hide interact button inside the corridor — hotspot icons serve as primary interaction feedback */
+/* Keep nearby actions visible for both touch and keyboard visitors. */
 #interact.inside-scene {
-    display: none;
-    pointer-events: none;
+    pointer-events: auto;
 }
 
 /* --- CHAT BUBBLE --- */
@@ -266,4 +265,70 @@ button.nav-link {
     z-index: 3;
     animation: flicker 2s ease-in-out infinite alternate;
     filter: drop-shadow(0 0 15px rgba(255, 150, 30, 0.6));
+}
+/* Field guide and accessible controls */
+.hotspot-marker {
+    padding: 0;
+    border: 0;
+    background: transparent;
+    color: inherit;
+    font: inherit;
+}
+.hotspot-marker:focus-visible,
+button:focus-visible, a:focus-visible, summary:focus-visible {
+    outline: 3px solid var(--gold);
+    outline-offset: 4px;
+}
+#chat { max-width: calc(100vw - 32px); white-space: normal; width: max-content; }
+#explorer-guide {
+    position: fixed;
+    left: 16px;
+    bottom: 24px;
+    z-index: 120;
+    width: min(320px, calc(100vw - 32px));
+    color: #f0e6c9;
+    border: 1px solid rgba(212, 168, 67, .45);
+    border-radius: 12px;
+    background: rgba(18, 17, 29, .94);
+    box-shadow: 0 8px 28px rgba(0, 0, 0, .3);
+    font: 14px/1.5 'Outfit', system-ui, sans-serif;
+    pointer-events: auto;
+}
+#explorer-guide summary { cursor: pointer; padding: 12px 16px; }
+#explorer-count { float: right; color: #d4a843; font-size: 12px; }
+.explorer-panel { padding: 0 16px 16px; max-height: min(55dvh, 400px); overflow-y: auto; }
+.explorer-panel h2 { font: 18px/1.4 'Cinzel', Georgia, serif; margin: 4px 0 10px; }
+.explorer-panel p { margin: 10px 0; }
+.explorer-pages { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin: 14px 0; }
+.explorer-pages button {
+    min-height: 44px;
+    padding: 8px;
+    color: #f0e6c9;
+    background: rgba(212, 168, 67, .08);
+    border: 1px solid rgba(212, 168, 67, .3);
+    border-radius: 6px;
+    cursor: pointer;
+    font: inherit;
+    text-align: left;
+}
+.explorer-pages .discovered { border-color: #d4a843; }
+.discovery-status, .explorer-panel a { color: #e8c978; }
+.explorer-controls { color: #c5bea9; font-size: 12px; }
+.portfolio-open #touch-controls, .portfolio-open #explorer-guide { visibility: hidden; }
+.touch-btn { touch-action: none; }
+@media (hover: none), (pointer: coarse) {
+    #explorer-guide { bottom: calc(94px + env(safe-area-inset-bottom)); }
+    #touch-controls { bottom: calc(16px + env(safe-area-inset-bottom)); }
+    #movement-instructions { display: none; }
+}
+@media (max-width: 640px) {
+    #global-nav { top: 12px; right: 12px; left: 12px; gap: 12px; justify-content: space-between; font-size: 1rem; }
+    #global-nav .nav-links, #global-nav .nav-socials { gap: 10px; align-items: center; }
+    #global-nav i { font-size: 1rem; }
+    #global-nav a, #global-nav .nav-btn { min-height: 36px; display: inline-flex; align-items: center; }
+    #back-button { top: 65px; left: 12px; }
+    .instruction-text { max-width: calc(100vw - 32px); white-space: normal; }
+}
+@media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; }
 }

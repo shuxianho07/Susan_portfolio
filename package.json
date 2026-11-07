@@ -2,6 +2,7 @@
   "name": "welcome-to-hogwarts",
   "version": "1.0.0",
   "scripts": {
-    "build": "cd fallback-app && npm install --include=dev && npm run build"
+    "build": "npm --prefix fallback-app run build",
+    "test": "node --test test/*.test.cjs"
   }
 }

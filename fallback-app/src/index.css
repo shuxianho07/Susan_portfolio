@@ -28,3 +28,22 @@
     color-scheme: dark;
   }
 }
+
+/* Keep the portfolio readable when web fonts are unavailable. */
+[class*="font-['Outfit']"] { font-family: 'Outfit', system-ui, sans-serif; }
+[class*="font-['Cinzel']"] { font-family: 'Cinzel', Georgia, serif; }
+[class*="font-['Patrick_Hand']"] { font-family: 'Patrick Hand', system-ui, sans-serif; }
+
+.skip-link {
+  position: fixed;
+  top: 0.75rem;
+  left: 1rem;
+  z-index: 100;
+  padding: 0.75rem 1rem;
+  background: var(--hogwarts-parchment);
+  color: var(--hogwarts-bg);
+  border-radius: 0.25rem;
+  transform: translateY(-200%);
+}
+.skip-link:focus { transform: translateY(0); }
+#main-content:focus { outline: none; }

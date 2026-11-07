@@ -1,0 +1,104 @@
+/* In-world archive panels: aged brass, dark timber, and readable warm text. */
+.portfolio-open #global-nav { visibility: hidden; }
+.overlay .overlay-backdrop { background: rgba(3, 9, 7, .58) !important; backdrop-filter: blur(3px) !important; }
+.overlay :is(.projects-container, .skills-container, .experience-container, .scrapbook-window) {
+    position: relative;
+    width: min(1120px, calc(100vw - 64px));
+    max-width: none;
+    height: auto;
+    max-height: calc(100dvh - 96px);
+    padding: 40px;
+    overflow-y: auto;
+    border: 1px solid #8a7446;
+    border-radius: 8px;
+    background: radial-gradient(ellipse at top left, rgba(115, 128, 89, .12), transparent 65%), #15221e;
+    box-shadow: 0 0 0 5px rgba(13, 20, 17, .92), 0 0 0 6px rgba(166, 143, 86, .25), 0 30px 100px #0009, inset 0 0 60px #0003;
+    color: #e8e1cb;
+    transform: none;
+    animation: archive-arrive .22s ease-out;
+    scrollbar-color: #8a7446 #15221e;
+    scrollbar-width: thin;
+}
+.overlay :is(.projects-title, .skills-title, .experience-title, .handwriting-title) {
+    font: 500 clamp(25px, 3vw, 36px)/1.3 'Cinzel', Georgia, serif;
+    color: #e1cb92;
+    margin: 0 40px 28px 0;
+    padding-bottom: 20px;
+    border-bottom: 1px solid #bda66b40;
+    transform: none;
+    text-shadow: none;
+}
+.overlay :is(.overlay-close, #close-scrapbook) {
+    position: absolute;
+    top: 16px;
+    right: 16px;
+    width: 40px;
+    height: 40px;
+    display: grid;
+    place-items: center;
+    padding: 0;
+    border: 1px solid #bda66b55;
+    border-radius: 50%;
+    background: #ffffff05;
+    color: #e1cb92;
+    font: 26px/1 system-ui, sans-serif;
+    transform: none;
+}
+.overlay :is(.overlay-close, #close-scrapbook):hover { background: #bda66b20; transform: none; }
+.overlay .projects-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 20px; overflow: visible; padding: 0; }
+.overlay :is(.project-card, .experience-card, .skill-item, .resume-box) {
+    background: rgba(7, 15, 12, .38);
+    border: 1px solid #a18c5840;
+    border-radius: 4px;
+    padding: 22px;
+    box-shadow: none;
+    transform: none;
+}
+.overlay :is(.project-card, .experience-card, .skill-item):hover { background: #bda66b09; transform: none; box-shadow: none; border-color: #a18c5880; }
+.overlay :is(.project-name, .exp-role, .skill-name, .resume-title) {
+    font: 500 21px/1.45 'Cinzel', Georgia, serif;
+    color: #e1cb92;
+    transform: none;
+    margin-bottom: 12px;
+}
+.overlay :is(.project-description, .skill-desc, .exp-bullets li, .exp-highlight, .bio-text, .exp-company, .exp-skills) {
+    font: 400 14px/1.8 'Outfit', system-ui, sans-serif;
+    color: #d5d6c8;
+}
+.overlay :is(.project-meta, .exp-date) { font: 400 12px/1.7 'Outfit', system-ui, sans-serif; color: #aeb9a7; margin-bottom: 20px; }
+.overlay :is(.project-link, .tape-btn, .resume-download-btn) {
+    font: 500 13px/1.6 'Outfit', system-ui, sans-serif;
+    color: #e1cb92;
+    border: 1px solid #a18c5870;
+    background: #bda66b0a;
+    border-radius: 3px;
+    padding: 9px 14px;
+    transform: none;
+    box-shadow: none;
+    text-decoration: none;
+}
+.overlay :is(.project-link, .tape-btn, .resume-download-btn):hover { background: #bda66b20; color: #f4e4b5; border-color: #bda66b; transform: none; }
+.overlay .skills-layout { height: auto; overflow: visible; grid-template-columns: 1.2fr 1fr; }
+.overlay :is(.skills-left, .skills-right) { overflow: visible; padding: 0; }
+.overlay .resume-box { min-height: 450px; max-height: none; }
+.overlay .resume-embed { min-height: 350px; }
+.overlay .experience-timeline { overflow: visible; border-color: #a18c5840; padding-right: 0; }
+.overlay .exp-timeline-marker { background: #bda66b; border-color: #15221e; box-shadow: 0 0 0 1px #a18c58; }
+.overlay .exp-highlight { background: #bda66b0d; border-color: #a18c58; }
+.overlay .exp-bullets li::before, .overlay .bio-text strong { color: #e1cb92; }
+.overlay .bio-container { color: #d5d6c8; }
+.overlay .polaroid { border: 1px solid #a18c5870; padding: 8px; background: #0b1510; transform: none; box-shadow: 0 8px 30px #0004; }
+.overlay .scrapbook-layout { align-items: flex-start; }
+#tutorial-replay { background: #bda66b12; border: 1px solid #a18c5870; border-radius: 4px; padding: 12px 16px; color: #e1cb92; font: 14px 'Outfit', system-ui, sans-serif; cursor: pointer; }
+#tutorial-replay { display: block; width: 100%; margin: 10px 0; }
+.room-marker-number { display: grid; place-items: center; width: 38px; height: 38px; border: 1px solid #d0b971; border-radius: 50%; background: #102019e6; color: #e1cb92; box-shadow: 0 0 20px #d0b97125; font: 16px Georgia, serif; }
+.scene-common-room ~ .hotspot-marker { transform: translate(-50%, -50%); }
+.scene-common-room ~ .hotspot-marker .hotspot-label { background: #102019d9; border: 1px solid #a18c5840; border-radius: 3px; padding: 6px 10px; font: 12px 'Outfit', system-ui, sans-serif; color: #e1cb92; }
+@keyframes archive-arrive { from { opacity: 0; translate: 0 10px; } to { opacity: 1; translate: 0 0; } }
+@media (max-width: 800px) {
+    .overlay :is(.projects-container, .skills-container, .experience-container, .scrapbook-window) { width: calc(100vw - 32px); max-height: calc(100dvh - 48px); padding: 24px; }
+    .overlay .projects-grid, .overlay .skills-layout { grid-template-columns: 1fr; }
+    .overlay .scrapbook-layout { flex-direction: column; gap: 24px; }
+    .overlay .photo-container { width: min(180px, 100%); margin: auto; }
+    .overlay .polaroid { height: 220px; object-fit: cover; }
+}

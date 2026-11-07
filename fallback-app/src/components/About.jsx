@@ -26,11 +26,11 @@ export default function About() {
             Experience
           </p>
           <h2 className="text-2xl font-['Cinzel'] font-bold tracking-tight text-hogwarts-parchment">
-            Practical AI, data, and internal tooling work
+            Data, analytics, and backend engineering
           </h2>
           <p className="mt-3 max-w-3xl text-sm leading-7 text-hogwarts-parchment/80 dark:text-hogwarts-parchment/70">
             Recent work experience where I connected real business workflows with automation, data pipelines,
-            searchable knowledge bases, and full-stack tools.
+            analytics, and full-stack tools.
           </p>
 
           <div className="mt-6 grid gap-5 lg:grid-cols-2">
@@ -77,15 +77,11 @@ export default function About() {
 
         <div className="mt-8 space-y-6 text-base leading-8 text-hogwarts-parchment/80 dark:text-hogwarts-parchment/80">
           <p>
-            My current focus is on building practical AI and data infrastructure. Through projects like CadenSci, I am exploring how Retrieval-Augmented Generation, vector databases, scientific paper ingestion, and LLM-based reasoning can help people search, understand, and organize large amounts of technical knowledge. I am especially interested in making AI systems more grounded, traceable, and useful for real workflows instead of only producing surface-level answers.
+            My projects connect data engineering with practical applications: predicting flight prices with Random Forest and ONNX, analyzing futures-market data with Python and PostgreSQL, and automating financial reporting with SQL, VBA, and Power BI.
           </p>
 
           <p>
-            I am also interested in quantitative finance and optimization. My Quant Backtesting & Portfolio Optimization Engine is a long-term project where I am building a realistic algorithmic trading research system from the ground up. Instead of only chasing profitable strategies, I focus on the engineering behind trustworthy backtests: standardized market data, portfolio accounting, transaction costs, slippage, next-bar execution, performance metrics, and optimization-based allocation. This project lets me connect programming, financial data, statistics, and combinatorics/optimization into one system.
-          </p>
-
-          <p>
-            Professionally, I have experience working on AI automation, full-stack internal tools, data pipelines, and knowledge-base systems for property-management and consulting workflows. These experiences taught me that strong software is not just about writing code. It is about understanding the actual business process, finding repeated manual work, designing a better workflow, and building tools that people can actually use.
+            My experience spans building a financial-literacy platform, consolidating financial data at the City of Markham, and analyzing user telemetry at Adobe. Across these roles, I focus on making data reliable and turning repeated manual work into useful tools.
           </p>
 
           <p>
@@ -111,7 +107,7 @@ export default function About() {
           <div className="glass-card interactive-card p-4">
             <p className="text-sm font-['Cinzel'] font-semibold text-hogwarts-parchment">Core focus</p>
             <p className="mt-1 text-sm leading-6 text-slate-600 dark:text-hogwarts-parchment/70">
-              RAG, vector databases, data pipelines, APIs, optimization, ML systems
+              Python, SQL, data pipelines, APIs, machine learning, financial analytics
             </p>
           </div>
           <div className="glass-card interactive-card p-4">

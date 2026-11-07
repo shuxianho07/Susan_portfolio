@@ -19,7 +19,7 @@ const CONFIG = {
         jumpSpeed: 700,
         spawnOutside: { xPct: 25, yPct: 85 },
         spawnInside: { xPct: 25, yPct: 85 },
-        spawnCommonRoom: { xPct: 25, yPct: 85 },
+        spawnCommonRoom: { xPct: 55, yPct: 85 },
     },
     physics: {
         gravity: 1400,
@@ -69,30 +69,10 @@ const CONFIG = {
         widthMultiplier: 1.0,
         exit: { xPct: 75, radius: 120 },
         hotspots: [
-            {
-                id: 'commonroom-upstairs',
-                label: 'Go Upstairs',
-                // Staircase is on the right ~70% across, ~60% down
-                xPct: 70, yPct: 60,
-                chat: 'The upper floor holds even more secrets...',
-                emoji: '🪜'
-            },
-            {
-                id: 'commonroom-sit',
-                label: 'Sit Down',
-                // Armchairs are center ~48% across, ~72% down
-                xPct: 48, yPct: 72,
-                chat: 'Taking a well-deserved rest by the fireplace...',
-                emoji: '🪑'
-            },
-            {
-                id: 'commonroom-window',
-                label: 'Look Outside',
-                // Window is center-left ~38% across, ~55% down
-                xPct: 38, yPct: 55,
-                chat: 'The castle grounds stretch far into the mist...',
-                emoji: '🪟'
-            }
+            { id: 'commonroom-projects', label: 'Project Desk', xPct: 28, yPct: 57, overlay: 'projects', glyph: '01' },
+            { id: 'commonroom-skills', label: 'Skills Library', xPct: 70, yPct: 24, overlay: 'skills', glyph: '02' },
+            { id: 'commonroom-experience', label: 'Experience Map', xPct: 56, yPct: 45, overlay: 'experience', glyph: '03' },
+            { id: 'commonroom-about', label: 'Meet Susan', xPct: 88, yPct: 54, overlay: 'about', glyph: '04' }
         ],
         hotspotRadius: 120
     },
@@ -128,6 +108,7 @@ updateCharacterDimensions();
 // =============================================
 let scene = 'outside';
 let keys = new Set();
+let jumpRequested = false;
 let lastTime = 0;
 let worldW = 0, worldH = 0;
 let corridorScale = 1; // worldH / 475 — converts corridor.jpg px → world px
@@ -394,6 +375,7 @@ enterBtn.addEventListener('click', () => {
         } else if (['skills', 'experience', 'projects', 'about'].includes(path)) {
             openOverlay(path, false);
         }
+        if (!overlayOpen && typeof maybeShowTutorial === 'function') maybeShowTutorial();
     }, 800);
 });
 

@@ -1,6 +1,6 @@
-# Jackie Zou Portfolio
+# Susan Ho Portfolio
 
-React + Vite portfolio for Jackie (Jiaqi) Zou, focused on AI infrastructure, backend engineering, data systems, quantitative research tools, and full-stack product workflows.
+React + Vite portfolio for Susan (Shuxian) Ho, focused on data engineering, machine learning, backend systems, and financial analytics.
 
 ## Tech Stack
 
@@ -15,7 +15,7 @@ React + Vite portfolio for Jackie (Jiaqi) Zou, focused on AI infrastructure, bac
 ## Run Locally
 
 ```sh
-npm install
+npm ci --include=dev
 npm run dev
 ```
 
@@ -25,7 +25,7 @@ npm run dev
 npm run build
 ```
 
-The production output is written to `dist/`.
+The production output is written to `../quick-links/`, with `/quick-links/` as the base URL.
 
 ## Project Structure
 
@@ -44,6 +44,6 @@ The production output is written to `dist/`.
 
 ## Notes
 
-- The old static HTML/JavaScript portfolio layer has been removed.
+- The static Hogwarts game is maintained in the repository root; serve it separately on port 8000.
 - Portfolio content should be updated through the React data files under `src/data/`.
 - Salary and pay-potential positioning should stay private and should not be shown publicly.

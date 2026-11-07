@@ -12,23 +12,25 @@ import Contact from './components/Contact';
 import NotFound from './pages/NotFound';
 
 export default function App() {
-  const [theme, setTheme] = useState('dark');
-
-  useEffect(() => {
-    const stored = localStorage.getItem('theme');
-    if (stored === 'dark') {
-      setTheme('dark');
+  const [theme, setTheme] = useState(() => {
+    try {
+      return localStorage.getItem('theme') === 'light' ? 'light' : 'dark';
+    } catch {
+      return 'dark';
     }
-  }, []);
+  });
 
   useEffect(() => {
     document.documentElement.classList.toggle('dark', theme === 'dark');
+    try {
+      localStorage.setItem('theme', theme);
+    } catch {
+      // Theme switching still works when browser storage is unavailable.
+    }
   }, [theme]);
 
   const toggleTheme = () => {
-    const next = theme === 'dark' ? 'light' : 'dark';
-    setTheme(next);
-    localStorage.setItem('theme', next);
+    setTheme(current => current === 'dark' ? 'light' : 'dark');
   };
 
   return (

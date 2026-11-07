@@ -4,17 +4,55 @@ const touchState = { left: false, right: false, up: false };
 let touchJumpTriggered = false;
 
 window.addEventListener('keydown', (e) => {
+    if (overlayOpen) {
+        const overlay = document.querySelector('.overlay:not(.hidden)');
+        if (e.key === 'Escape' && overlay) {
+            e.preventDefault();
+            closeOverlay(overlay.id.replace('overlay-', ''));
+        } else if (e.key === 'Tab' && overlay) {
+            const focusable = [...overlay.querySelectorAll('a[href], button, input, iframe, [tabindex="0"]')]
+                .filter(el => el.getClientRects().length && !el.disabled);
+            const first = focusable[0];
+            const last = focusable[focusable.length - 1];
+            if (e.shiftKey && (document.activeElement === first || !overlay.contains(document.activeElement))) {
+                e.preventDefault();
+                last?.focus();
+            } else if (!e.shiftKey && (document.activeElement === last || !overlay.contains(document.activeElement))) {
+                e.preventDefault();
+                first?.focus();
+            }
+        }
+        return;
+    }
+    if (gameEl.classList.contains('hidden') || e.target.closest('a, button, summary, input, textarea, select, [contenteditable="true"]')) return;
     const key = e.key.toLowerCase();
     if (['a', 'arrowleft', 'd', 'arrowright', 'w', 'arrowup', ' ', 'enter', 'e'].includes(key)) {
         e.preventDefault();
-        keys.add(key);
         resetIdleChatTimer();
+        if (key === 'e' || key === 'enter') {
+            if (!e.repeat) performInteraction();
+        } else {
+            if (['w', 'arrowup', ' '].includes(key) && !e.repeat) jumpRequested = true;
+            keys.add(key);
+        }
     }
 });
 
 window.addEventListener('keyup', (e) => {
     const key = e.key.toLowerCase();
     keys.delete(key);
+});
+
+function clearMovement() {
+    keys.clear();
+    Object.keys(touchState).forEach(key => { touchState[key] = false; });
+    touchJumpTriggered = false;
+    jumpRequested = false;
+    document.querySelectorAll('.touch-btn.active').forEach(btn => btn.classList.remove('active'));
+}
+window.addEventListener('blur', clearMovement);
+document.addEventListener('visibilitychange', () => {
+    if (document.hidden) clearMovement();
 });
 
 function isLeft() { return keys.has('a') || keys.has('arrowleft') || touchState.left; }
@@ -37,8 +75,7 @@ function setupTouchControls() {
             touchState[key] = true;
             btn.classList.add('active');
             if (key === 'up' && onGround && !touchJumpTriggered) {
-                vy = -CONFIG.character.jumpSpeed;
-                onGround = false;
+                jumpRequested = true;
                 touchJumpTriggered = true;
             }
         }, { passive: false });
@@ -105,7 +142,7 @@ function enterHouse(pushState = true) {
 function enterCommonRoom(pushState = true) {
     fadeOutIn(() => {
         setupScene('commonRoom');
-        showChat('Welcome to the Common Room! Explore to find my portfolio...');
+        showChat('Welcome to the study. Open the desk, library, or maps to explore.');
         if (window.va) va('event', 'enter_common_room');
         if (pushState) setRoute('/common-room', { scene: 'commonRoom' });
     });
@@ -146,7 +183,7 @@ function showChat(text, duration = 3000) {
 function resetIdleChatTimer() {
     if (idleChatTimerId) clearTimeout(idleChatTimerId);
     // Only start when game is running and not in a transition/overlay
-    if (overlayOpen || sceneTransitioning) return;
+    if (overlayOpen || sceneTransitioning || walkthrough.active) return;
 
     idleChatTimerId = setTimeout(() => {
         const line = IDLE_CHAT_LINES[Math.floor(Math.random() * IDLE_CHAT_LINES.length)];
@@ -158,9 +195,9 @@ function resetIdleChatTimer() {
 function positionChatAboveCharacter() {
     const { w } = viewportSize();
     const screenX = charX - cameraX;
-    const screenY = charY - CONFIG.character.height - 120;
-    chatEl.style.left = (screenX - chatEl.offsetWidth / 2-10) + 'px';
-    chatEl.style.top = screenY + 'px';
+    const screenY = charY - CONFIG.character.height - 65;
+    chatEl.style.left = clamp(screenX - chatEl.offsetWidth / 2, 12, Math.max(12, w - chatEl.offsetWidth - 12)) + 'px';
+    chatEl.style.top = Math.max(90, screenY) + 'px';
 }
 
 // Vertical offset for the interact prompt (higher = more negative)
@@ -186,10 +223,21 @@ function setRoute(path, state = {}) {
     }
 }
 
+let overlayOpener = null;
+
 function openOverlay(id, pushState = true) {
     const overlay = document.getElementById('overlay-' + id);
     if (!overlay) return;
+    if (!overlayOpen) overlayOpener = document.activeElement;
+    document.querySelectorAll('.overlay:not(.hidden)').forEach(other => {
+        if (other !== overlay) hide(other);
+    });
+    clearMovement();
     overlayOpen = true;
+    document.body.classList.add('portfolio-open');
+    overlay.setAttribute('role', 'dialog');
+    overlay.setAttribute('aria-modal', 'true');
+    overlay.setAttribute('aria-label', `${id.charAt(0).toUpperCase() + id.slice(1)} portfolio section`);
     
     // Update z-index: make sure the newly opened overlay is on top
     const allOverlays = document.querySelectorAll('.overlay:not(.hidden)');
@@ -201,6 +249,9 @@ function openOverlay(id, pushState = true) {
     overlay.style.zIndex = maxZ;
     
     show(overlay);
+    if (typeof recordDiscovery === 'function') recordDiscovery(id);
+    if (typeof walkthroughOpened === 'function') walkthroughOpened(id);
+    overlay.querySelector('.overlay-close')?.focus();
     if (window.va) va('event', 'open_overlay', { id: id });
     
     if (pushState) {
@@ -214,6 +265,7 @@ function closeOverlay(id, pushState = true) {
     hide(overlay);
     overlay.style.zIndex = '200'; // Reset z-index when closing
     overlayOpen = false;
+    document.body.classList.remove('portfolio-open');
     canInteract = false;
     currentInteraction = null;
     // Consume key so it doesn't re-trigger
@@ -221,7 +273,12 @@ function closeOverlay(id, pushState = true) {
     keys.delete('e');
 
     // Re-grab keyboard focus after overlay closes
-    gameEl.focus();
+    if (overlayOpener?.isConnected && overlayOpener !== document.body && overlayOpener.getClientRects().length) {
+        overlayOpener.focus();
+        if (document.activeElement !== overlayOpener) gameEl.focus();
+    } else gameEl.focus();
+    overlayOpener = null;
+    if (typeof walkthroughClosed === 'function') walkthroughClosed(id);
     resetIdleChatTimer();
     
     if (pushState) {
@@ -269,15 +326,22 @@ document.querySelectorAll('[data-open]').forEach(el => {
 });
 
 // Interact button click
-interactBtn.addEventListener('click', () => {
+function performInteraction() {
+    if (!canInteract || overlayOpen || sceneTransitioning || enterAnimRunning) return;
     if (currentInteraction === 'door') {
         enterHouse();
     } else if (currentInteraction === 'exit') {
         exitHouse();
+    } else if (currentInteraction === 'commonRoom') {
+        enterCommonRoom();
+    } else if (currentInteraction?.startsWith('commonroom-')) {
+        const hotspot = CONFIG.commonRoom.hotspots.find(hs => hs.id === currentInteraction);
+        if (hotspot) openOverlay(hotspot.overlay);
     } else if (currentInteraction) {
         openOverlay(currentInteraction);
     }
-});
+}
+interactBtn.addEventListener('click', performInteraction);
 
 // Back button
 backButton.addEventListener('click', () => {

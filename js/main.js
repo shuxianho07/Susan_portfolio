@@ -1,3 +1,4 @@
+let jumpWasDown = false;
 // GAME LOOP
 // =============================================
 function tick(timestamp) {
@@ -14,6 +15,7 @@ function tick(timestamp) {
 
     smoothCamera(dt);
     updateSpotlight();
+    updateWalkthrough();
 
     // Keep chat following character
     if (!chatEl.classList.contains('hidden')) {
@@ -48,10 +50,13 @@ function updatePhysics(dt) {
     }
 
     // Jump (allowed in all scenes)
-    if (isJump() && onGround) {
+    if ((jumpRequested || (isJump() && !jumpWasDown)) && onGround) {
         vy = -CONFIG.character.jumpSpeed;
         onGround = false;
     }
+
+    jumpRequested = false;
+    jumpWasDown = isJump();
 
     // Gravity + ground collision (all scenes)
     vy += CONFIG.physics.gravity * dt;
@@ -204,7 +209,7 @@ function updateInteractions() {
 
         // Check hotspot proximity
         CONFIG.inside.hotspots.forEach(hs => {
-            const hsX    = hs.bgImgX * corridorScale;
+            const hsX    = (hs.bgImgX + hs.bgImgW / 2) * corridorScale;
             const hsDist = Math.abs(charX - hsX);
 
             // Update marker glow state
@@ -234,6 +239,13 @@ function updateInteractions() {
             if (marker) {
                 marker.classList.toggle('near', hsDist < CONFIG.commonRoom.hotspotRadius);
             }
+            if (hsDist < CONFIG.commonRoom.hotspotRadius && !canInteract) {
+                canInteract = true;
+                currentInteraction = hs.id;
+                show(interactBtn);
+                interactBtn.textContent = `${hs.label} ⏎`;
+                positionInteractButton(hsX, getGroundY() - CONFIG.character.height);
+            }
         });
     }
 
@@ -242,22 +254,7 @@ function updateInteractions() {
         hide(interactBtn);
     }
 
-    // Handle action key
-    if (isAction() && canInteract && !overlayOpen) {
-        keys.delete('enter');
-        keys.delete('e');
-        if (currentInteraction === 'door') {
-            enterHouse();
-        } else if (currentInteraction === 'exit') {
-            exitHouse();
-        } else if (currentInteraction === 'commonRoom') {
-            enterCommonRoom();
-        } else if (currentInteraction === 'exitCommonRoom') {
-            exitCommonRoom();
-        } else {
-            openOverlay(currentInteraction);
-        }
-    }
+
 }
 
 // =============================================
@@ -291,15 +288,17 @@ function startGame() {
     gameEl.style.outline = 'none';
     gameEl.focus();
 
-    // Re-grab focus any time the user clicks inside the game
-    gameEl.addEventListener('click', () => gameEl.focus());
+    // Keep controls and dialog links focusable when clicked.
+    gameEl.addEventListener('click', event => {
+        if (!overlayOpen && !event.target.closest('a, button, input, iframe, [contenteditable="true"]')) gameEl.focus();
+    });
 
     // Show instructions
     show(instructionsEl);
 
     // Welcome chat
     setTimeout(() => {
-        showChat('Welcome to Susan Ho\'s Personal Space! Use arrow keys to explore.');
+        if (!walkthrough.active) showChat('Welcome to Susan Ho\'s Personal Space! Use arrow keys to explore.');
         resetIdleChatTimer();
     }, 500);
 
@@ -312,59 +311,15 @@ function startGame() {
 // =============================================
 window.addEventListener('resize', () => {
     if (gameEl.classList.contains('hidden')) return;
-    const { w, h } = viewportSize();
-
-    // Recalculate world size
-    if (scene === 'outside') {
-        worldW = Math.max(w * CONFIG.outside.widthMultiplier, 1600);
-    } else if (scene === 'commonRoom') {
-        worldW = w * CONFIG.commonRoom.widthMultiplier;
-    } else {
-        worldW = Math.max(w * CONFIG.inside.widthMultiplier, 3000);
-    }
-    worldH = h;
-
-    bgEl.style.width = worldW + 'px';
-    bgEl.style.height = worldH + 'px';
-    worldEl.style.width = worldW + 'px';
-    worldEl.style.height = worldH + 'px';
-
-    // Re-ground character (skip for 2.5D commonRoom — clamp Y to perspective bounds instead)
-    if (scene === 'commonRoom') {
-        const minY = worldH * 0.4;
-        const maxY = worldH * 0.85;
-        charY = clamp(charY, minY, maxY);
-    } else {
-        const groundY = getGroundY();
-        if (onGround) charY = groundY;
-    }
-
-    // Clamp within bounds (if configured), otherwise use full world bounds
-    const sceneBounds = CONFIG.bounds && CONFIG.bounds[scene];
-    if (sceneBounds) {
-        const minX = (sceneBounds.minPct / 100) * worldW;
-        const maxX = (sceneBounds.maxPct / 100) * worldW;
-        charX = clamp(charX, minX, maxX);
-    } else {
-        charX = clamp(charX, CONFIG.character.width / 2, worldW - CONFIG.character.width / 2);
-    }
-
+    const position = worldW ? charX / worldW : 0.25;
+    const facing = lastFacing;
+    updateCharacterDimensions();
+    clearMovement();
+    setupScene(scene);
+    charX = position * worldW;
+    lastFacing = facing;
     placeCharacter();
     centerCamera();
-});
-
-// =============================================
-// KEYBOARD SHORTCUT: ESC to close overlays
-// =============================================
-window.addEventListener('keydown', (e) => {
-    if (e.key === 'Escape' && overlayOpen) {
-        // Find open overlay and close it
-        document.querySelectorAll('.overlay:not(.hidden)').forEach(ol => {
-            const backdrop = ol.querySelector('.overlay-backdrop');
-            const closeId = backdrop?.dataset.close;
-            if (closeId) closeOverlay(closeId);
-        });
-    }
 });
 
 // =============================================
