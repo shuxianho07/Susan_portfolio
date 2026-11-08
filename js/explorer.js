@@ -10,11 +10,12 @@ function updateExplorer() {
     const count = discoveries.size;
     document.getElementById('explorer-count').textContent = `${count} / 4 discovered`;
     document.getElementById('explorer-location').textContent = { outside: 'Castle Grounds', inside: 'Portfolio Corridor', commonRoom: 'Common Room' }[scene];
-    document.getElementById('explorer-objective').textContent = count === 4
+    document.getElementById('explorer-objective').textContent = scene === 'commonRoom'
+        ? 'Visit the stock-pitch library at the writing desk. The corridor holds the portfolio archives.'
+        : count === 4
         ? 'All four pages discovered. Thank you for exploring!'
         : scene === 'outside' ? 'Walk right to the castle door and press E, or tap Enter Inside.'
-        : scene === 'inside' ? 'Explore the glowing objects, or open a page below.'
-        : 'Open the project desk, skills library, experience map, or introduction. Back returns to the corridor.';
+        : 'Explore the glowing objects, or open a page below.';
     document.querySelectorAll('[data-discover]').forEach(button => {
         const visited = discoveries.has(button.dataset.discover);
         button.classList.toggle('discovered', visited);

@@ -69,10 +69,7 @@ const CONFIG = {
         widthMultiplier: 1.0,
         exit: { xPct: 75, radius: 120 },
         hotspots: [
-            { id: 'commonroom-projects', label: 'Project Desk', xPct: 28, yPct: 57, overlay: 'projects', glyph: '01' },
-            { id: 'commonroom-skills', label: 'Skills Library', xPct: 70, yPct: 24, overlay: 'skills', glyph: '02' },
-            { id: 'commonroom-experience', label: 'Experience Map', xPct: 56, yPct: 45, overlay: 'experience', glyph: '03' },
-            { id: 'commonroom-about', label: 'Meet Susan', xPct: 88, yPct: 54, overlay: 'about', glyph: '04' }
+            { id: 'commonroom-pitches', label: 'Stock Pitch Library', xPct: 28, yPct: 57, overlay: 'room-pitches', glyph: '↗' }
         ],
         hotspotRadius: 120
     },

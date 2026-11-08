@@ -177,7 +177,7 @@ The game runs on port 8000; the React development app uses `/quick-links/` on po
 npm test
 ```
 
-First-time visitors receive a skippable interactive walkthrough: move, jump, enter the castle, open a glowing object, close its archive, and open the field guide. Steps advance only after the visitor performs each action; the game stays playable throughout. The field guide can replay it and tracks the four portfolio sections locally in the browser. The Common Room is an interactive study: its desk, library, and maps open portfolio archives.
+First-time visitors receive a skippable interactive walkthrough: move, jump, enter the castle, open a glowing object, close its archive, and open the field guide. Steps advance only after the visitor performs each action; the game stays playable throughout. The field guide can replay it and tracks the four portfolio sections locally in the browser. The corridor holds the four portfolio archives. The Common Room is a dedicated stock-pitch presentation library with search, year filters, an embedded PDF reader, and downloads. Published decks are listed in `js/stock-pitches.js`; no sample presentations are published.
 
 The optional live chatbot needs a Vercel-compatible runtime, a server-side `GEMINI_API_KEY`, and access to `generativelanguage.googleapis.com`. The local frontend falls back to answers derived from repository content when the API is unavailable. Do not put API keys in frontend files.
 
@@ -255,3 +255,12 @@ Created by Susan Ho. Feel free to fork, modify, and adapt this portfolio templat
 ##  License
 
 This project is open source and available under the [MIT License](LICENSE).
+
+## Stock-pitch presentations
+
+Place presentation PDFs under `assets/stock-pitches/` and add their metadata to
+`js/stock-pitches.js`. Each entry uses `id`, `title`, `company`, `ticker`, `date`
+(YYYY-MM-DD), `summary`, and `pdf` (a site-relative URL). Optional `slides` links
+to the original PowerPoint file. Publish only decks and research supplied by Susan;
+do not invent companies, theses, returns, or competition results. The library
+shows an empty state until actual presentation files are supplied.
