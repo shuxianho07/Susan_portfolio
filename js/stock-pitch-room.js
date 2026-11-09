@@ -16,10 +16,11 @@ function pitchDate(date) {
 }
 function publishedPitches() {
     return STOCK_PITCHES.filter(pitch => pitch && typeof pitch.id === 'string' && typeof pitch.title === 'string' && pitchUrl(pitch.pdf))
-        .slice().sort((a, b) => String(b.date || '').localeCompare(String(a.date || '')));
+        .slice().sort((a, b) => String(b.date || b.asOf || '').localeCompare(String(a.date || a.asOf || '')));
 }
 function pitchMetadata(pitch) {
-    return [pitch.company, pitch.ticker, pitchDate(pitch.date)].filter(Boolean).join(' · ');
+    const date = pitch.date ? pitchDate(pitch.date) : pitch.asOf ? `Data as of ${pitchDate(pitch.asOf)}` : '';
+    return [pitch.company, pitch.ticker, date].filter(Boolean).join(' · ');
 }
 function renderStockPitch(pitch) {
     const pdf = pitchUrl(pitch.pdf);
@@ -47,7 +48,7 @@ function openStockPitch(pitch) {
 function renderStockPitches() {
     const all = publishedPitches();
     const query = pitchSearch.value.trim().toLowerCase();
-    const pitches = all.filter(pitch => (!pitchYear.value || String(pitch.date || '').startsWith(pitchYear.value)) &&
+    const pitches = all.filter(pitch => (!pitchYear.value || (pitchYear.value === 'undated' ? !pitch.date && !pitch.asOf : String(pitch.date || pitch.asOf || '').startsWith(pitchYear.value))) &&
         (!query || [pitch.title, pitch.company, pitch.ticker, pitch.summary].join(' ').toLowerCase().includes(query)));
     const grid = document.getElementById('pitch-grid');
     grid.replaceChildren();
@@ -83,10 +84,12 @@ function stockPitchOverlayOpened(id) {
     }
     if (id === 'room-pitches') {
         const currentYear = pitchYear.value;
-        const years = [...new Set(publishedPitches().map(pitch => String(pitch.date || '').slice(0, 4)).filter(year => /^\d{4}$/.test(year)))].sort().reverse();
+        const years = [...new Set(publishedPitches().map(pitch => String(pitch.date || pitch.asOf || '').slice(0, 4)).filter(year => /^\d{4}$/.test(year)))].sort().reverse();
         pitchYear.replaceChildren(new Option('All years', ''));
         years.forEach(year => pitchYear.appendChild(new Option(year, year)));
-        if (years.includes(currentYear)) pitchYear.value = currentYear;
+        const hasUndated = publishedPitches().some(pitch => !pitch.date && !pitch.asOf);
+        if (hasUndated) pitchYear.appendChild(new Option('Date not specified', 'undated'));
+        if (years.includes(currentYear) || hasUndated && currentYear === 'undated') pitchYear.value = currentYear;
         renderStockPitches();
     }
 }
