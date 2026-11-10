@@ -3,6 +3,10 @@
 const STOCK_PITCHES = [
     {
         id: 'cme-group',
+        exhibit: 'The machinery of markets',
+        theme: 'Market structure',
+        art: '/assets/gallery/cme-group.webp',
+        artAlt: 'Acrylic painting of an antique pocket watch and a financial chart',
         title: 'CME Group — Stock Pitch',
         company: 'CME Group',
         ticker: 'CME',
@@ -13,6 +17,10 @@ const STOCK_PITCHES = [
     },
     {
         id: 'uranium-energy',
+        exhibit: 'Beneath the surface',
+        theme: 'Energy & policy',
+        art: '/assets/gallery/uranium-energy.webp',
+        artAlt: 'Acrylic painting of a green mineral specimen',
         title: 'Uranium Energy Corp. — Stock Pitch',
         company: 'Uranium Energy Corp.',
         ticker: 'UEC',
@@ -23,6 +31,10 @@ const STOCK_PITCHES = [
     },
     {
         id: 'teva',
+        exhibit: 'The apothecary',
+        theme: 'Healthcare',
+        art: '/assets/gallery/teva.webp',
+        artAlt: 'Acrylic painting of an amber apothecary bottle and botanical sprig',
         title: 'Teva — Stock Pitch',
         company: 'Teva Pharmaceutical Industries',
         ticker: 'TEVA',
@@ -33,6 +45,10 @@ const STOCK_PITCHES = [
     },
     {
         id: 'flywire',
+        exhibit: 'Across borders',
+        theme: 'Global payments',
+        art: '/assets/gallery/flywire.webp',
+        artAlt: 'Acrylic painting of a globe and paper airplane',
         title: 'Flywire — Stock Pitch',
         company: 'Flywire Corp.',
         ticker: 'FLYW',

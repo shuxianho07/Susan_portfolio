@@ -35,3 +35,13 @@ test('presentation dates and data cutoffs are distinguished in the catalog', () 
   const flywire = catalog.find(pitch => pitch.id === 'flywire');
   assert.ok(!flywire.date && !flywire.asOf, 'do not infer an unstated Flywire date');
 });
+
+test('each gallery exhibit has an accessible label and a valid painted WebP asset', () => {
+  for (const pitch of catalog) {
+    assert.ok(pitch.exhibit && pitch.theme && pitch.artAlt, `${pitch.id} needs gallery labels`);
+    assert.match(pitch.art, /^\/assets\/gallery\/[a-z0-9-]+\.webp$/);
+    const image = fs.readFileSync(path.join(root, pitch.art));
+    assert.equal(image.subarray(0, 4).toString(), 'RIFF');
+    assert.equal(image.subarray(8, 12).toString(), 'WEBP');
+  }
+});
