@@ -91,6 +91,8 @@ function stockPitchOverlayOpened(id) {
         if (hasUndated) pitchYear.appendChild(new Option('Date not specified', 'undated'));
         if (years.includes(currentYear) || hasUndated && currentYear === 'undated') pitchYear.value = currentYear;
         renderStockPitches();
+        renderPitchGallery();
+        setPitchLibraryView(galleryListView);
     }
 }
 pitchSearch.addEventListener('input', renderStockPitches);
@@ -102,3 +104,98 @@ document.getElementById('pitch-reset').addEventListener('click', () => {
     pitchSearch.focus();
 });
 document.getElementById('pitch-back').addEventListener('click', () => openOverlay('room-pitches'));
+
+// A visitor-led exhibition: arrows, keyboard, thumbnails, or a horizontal swipe.
+let galleryIndex = 0;
+let galleryListView = false;
+let galleryPointer = null;
+let gallerySuppressClick = false;
+function renderPitchGallery() {
+    const pitches = publishedPitches();
+    if (!pitches.length) { setPitchLibraryView(true); return; }
+    galleryIndex = (galleryIndex + pitches.length) % pitches.length;
+    const pitch = pitches[galleryIndex];
+    const image = document.getElementById('gallery-art');
+    image.src = pitchUrl(pitch.art) || '';
+    image.alt = pitch.artAlt || `${pitch.company} exhibit`;
+    document.getElementById('gallery-art-button').setAttribute('aria-label', `Open ${pitch.title}`);
+    document.getElementById('gallery-number').textContent = `EXHIBIT ${String(galleryIndex + 1).padStart(2, '0')} / ${String(pitches.length).padStart(2, '0')}`;
+    document.getElementById('gallery-theme').textContent = pitch.theme || 'Investment research';
+    document.getElementById('gallery-title').textContent = pitch.exhibit || pitch.company;
+    document.getElementById('gallery-meta').textContent = pitchMetadata(pitch);
+    document.getElementById('gallery-summary').textContent = pitch.summary || '';
+    const tabs = document.getElementById('gallery-tabs');
+    // Keep the controls in place so keyboard focus survives selection changes.
+    if (tabs.children.length !== pitches.length) {
+        tabs.replaceChildren();
+        pitches.forEach((item, index) => {
+            const button = document.createElement('button');
+            button.type = 'button';
+            button.setAttribute('aria-label', `Show ${item.company} exhibit`);
+            const thumbnail = document.createElement('img');
+            thumbnail.src = pitchUrl(item.art) || '';
+            thumbnail.alt = '';
+            const label = document.createElement('span');
+            label.textContent = item.ticker;
+            button.append(thumbnail, label);
+            button.addEventListener('click', () => { galleryIndex = index; renderPitchGallery(); });
+            tabs.appendChild(button);
+        });
+    }
+    [...tabs.children].forEach((button, index) => button.setAttribute('aria-pressed', String(index === galleryIndex)));
+}
+function moveGallery(direction) {
+    galleryIndex += direction;
+    renderPitchGallery();
+}
+function setPitchLibraryView(listView) {
+    galleryListView = listView;
+    document.getElementById('pitch-list-view').hidden = !listView;
+    document.getElementById('pitch-gallery').hidden = listView;
+    const toggle = document.getElementById('pitch-view-toggle');
+    toggle.textContent = listView ? '← Back to gallery' : 'View all pitches';
+    toggle.setAttribute('aria-expanded', String(listView));
+}
+function openGalleryPitch() {
+    if (gallerySuppressClick) return;
+    const pitch = publishedPitches()[galleryIndex];
+    if (pitch) openStockPitch(pitch);
+}
+document.getElementById('pitch-view-toggle').addEventListener('click', () => setPitchLibraryView(!galleryListView));
+document.getElementById('gallery-previous').addEventListener('click', () => moveGallery(-1));
+document.getElementById('gallery-next').addEventListener('click', () => moveGallery(1));
+document.getElementById('gallery-open').addEventListener('click', openGalleryPitch);
+document.getElementById('gallery-art-button').addEventListener('click', openGalleryPitch);
+document.getElementById('pitch-gallery').addEventListener('keydown', event => {
+    if (['ArrowLeft', 'ArrowRight', 'Home', 'End'].includes(event.key)) {
+        event.preventDefault();
+        event.stopPropagation();
+        if (event.key === 'Home') galleryIndex = 0;
+        else if (event.key === 'End') galleryIndex = publishedPitches().length - 1;
+        else galleryIndex += event.key === 'ArrowRight' ? 1 : -1;
+        renderPitchGallery();
+    }
+});
+const galleryStage = document.getElementById('gallery-art-stage');
+galleryStage.addEventListener('pointerdown', event => {
+    if (!event.isPrimary || event.button !== 0) return;
+    galleryPointer = { id: event.pointerId, x: event.clientX, y: event.clientY };
+});
+galleryStage.addEventListener('pointermove', event => {
+    if (!galleryPointer || galleryPointer.id !== event.pointerId) return;
+    const dx = Math.abs(event.clientX - galleryPointer.x);
+    const dy = Math.abs(event.clientY - galleryPointer.y);
+    if (dx > 10 && dx > dy) galleryStage.setPointerCapture(event.pointerId);
+});
+galleryStage.addEventListener('pointerup', event => {
+    if (!galleryPointer || galleryPointer.id !== event.pointerId) return;
+    const dx = event.clientX - galleryPointer.x;
+    const dy = event.clientY - galleryPointer.y;
+    galleryPointer = null;
+    if (Math.abs(dx) > 50 && Math.abs(dx) > Math.abs(dy) * 1.2) {
+        gallerySuppressClick = true;
+        moveGallery(dx < 0 ? 1 : -1);
+        setTimeout(() => { gallerySuppressClick = false; }, 0);
+    }
+});
+galleryStage.addEventListener('pointercancel', () => { galleryPointer = null; });

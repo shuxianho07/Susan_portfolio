@@ -266,3 +266,13 @@ date is stated. Optional `slides` links to the original PowerPoint file. Publish
 do not invent companies, theses, returns, or competition results. PDF exports preserve slide counts; original `.pptx` downloads preserve the supplied
 files unchanged. When adding or replacing decks, check PDF page counts and visual
 layout, then verify the reader and download links.
+
+### Illustrated gallery
+
+The Common Room opens a visitor-controlled gallery of acrylic-style exhibits.
+Use the previous/next buttons, arrow keys (Home/End jump to the ends), thumbnails,
+or horizontal swipes on the artwork. Select a painting to open its pitch deck.
+“View all pitches” retains the searchable catalog and year filters. Reduced-motion
+preferences disable the artwork lift transition. Exhibit artwork is stored in
+`assets/gallery/` and linked through `art`, `artAlt`, `exhibit`, and `theme` in the
+pitch catalog; these illustrations are decorative, not financial charts or deck content.
