@@ -206,8 +206,8 @@ const INTERACT_BUTTON_VERTICAL_OFFSET = 140;
 function positionInteractButton(worldX, worldY) {
     const screenX = worldX - cameraX;
     const screenY = worldY;
-    interactBtn.style.left = (screenX - interactBtn.offsetWidth / 2) + 'px';
-    interactBtn.style.top = (screenY - INTERACT_BUTTON_VERTICAL_OFFSET) + 'px';
+    interactBtn.style.left = clamp(screenX - interactBtn.offsetWidth / 2, 12, Math.max(12, window.innerWidth - interactBtn.offsetWidth - 12)) + 'px';
+    interactBtn.style.top = clamp(screenY - INTERACT_BUTTON_VERTICAL_OFFSET, 80, Math.max(80, window.innerHeight - interactBtn.offsetHeight - 100)) + 'px';
 }
 
 function setRoute(path, state = {}) {
