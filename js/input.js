@@ -142,7 +142,7 @@ function enterHouse(pushState = true) {
 function enterCommonRoom(pushState = true) {
     fadeOutIn(() => {
         setupScene('commonRoom');
-        showChat('Welcome to the study. Open the desk, library, or maps to explore.');
+        showChat('Welcome to the investment study. Open the desk to browse my stock-pitch presentations.');
         if (window.va) va('event', 'enter_common_room');
         if (pushState) setRoute('/common-room', { scene: 'commonRoom' });
     });
@@ -237,7 +237,7 @@ function openOverlay(id, pushState = true) {
     document.body.classList.add('portfolio-open');
     overlay.setAttribute('role', 'dialog');
     overlay.setAttribute('aria-modal', 'true');
-    overlay.setAttribute('aria-label', `${id.charAt(0).toUpperCase() + id.slice(1)} portfolio section`);
+    overlay.setAttribute('aria-label', overlay.dataset.dialogLabel || `${id.charAt(0).toUpperCase() + id.slice(1)} portfolio section`);
     
     // Update z-index: make sure the newly opened overlay is on top
     const allOverlays = document.querySelectorAll('.overlay:not(.hidden)');
@@ -251,11 +251,13 @@ function openOverlay(id, pushState = true) {
     show(overlay);
     if (typeof recordDiscovery === 'function') recordDiscovery(id);
     if (typeof walkthroughOpened === 'function') walkthroughOpened(id);
+    if (typeof stockPitchOverlayOpened === 'function') stockPitchOverlayOpened(id);
     overlay.querySelector('.overlay-close')?.focus();
     if (window.va) va('event', 'open_overlay', { id: id });
     
     if (pushState) {
-        setRoute('/' + id, { overlayId: id });
+        const path = id.startsWith('room-') ? '/common-room' : '/' + id;
+        setRoute(path, { overlayId: id, scene });
     }
 }
 

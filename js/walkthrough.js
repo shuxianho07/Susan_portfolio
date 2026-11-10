@@ -8,7 +8,7 @@ const walkthroughSteps = [
     { title: 'Try a jump', desktop: 'Press Space, W, or ↑. Give it a try!', mobile: 'Tap the ↑ button to jump.', desktopKeys: ['Space'], mobileKeys: ['↑'] },
     { title: 'Enter the castle', desktop: 'Walk toward the glowing door, then press E.', mobile: 'Walk toward the door, then tap Enter Inside.', desktopKeys: ['→', 'E'], mobileKeys: ['→', 'Tap door'] },
     { title: 'Open a glowing object', desktop: 'Click a highlighted object, or walk up and press E.', mobile: 'Tap a highlighted object to open its archive.', desktopKeys: ['Click', 'E'], mobileKeys: ['Tap object'] },
-    { title: 'Return to the corridor', desktop: 'Press Esc or click the highlighted ×.', mobile: 'Tap the highlighted × to close the archive.', desktopKeys: ['Esc'], mobileKeys: ['×'] },
+    { title: 'Back to exploring', desktop: 'Press Esc or click the highlighted ×.', mobile: 'Tap the highlighted × to close the archive.', desktopKeys: ['Esc'], mobileKeys: ['×'] },
     { title: 'Open your field guide', desktop: 'Click the glowing guide to see your discoveries.', mobile: 'Tap the glowing guide above the movement buttons.', desktopKeys: ['Open guide'], mobileKeys: ['Tap guide'] }
 ];
 
@@ -85,7 +85,7 @@ function maybeShowTutorial() {
 }
 
 function walkthroughOpened(id) {
-    if (walkthrough.active && walkthrough.step === 3 && scene !== 'outside' && Object.hasOwn(discoveryLabels, id)) {
+    if (walkthrough.active && walkthrough.step === 3 && scene !== 'outside' && (Object.hasOwn(discoveryLabels, id) || CONFIG.commonRoom.hotspots.some(hotspot => hotspot.overlay === id))) {
         walkthrough.archive = id;
         advanceWalkthrough();
     }
