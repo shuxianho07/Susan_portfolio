@@ -17,6 +17,7 @@
     <link rel="stylesheet" href="css/projects.css?v=3">
     <link rel="stylesheet" href="css/archives.css?v=1">
     <link rel="stylesheet" href="css/walkthrough.css?v=1">
+    <link rel="stylesheet" href="css/stock-pitch-room.css?v=1">
     <link
         href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@400;700&family=Cinzel:wght@400;600;700&family=Outfit:wght@300;400;600&family=Caveat:wght@400..700&family=Patrick+Hand&display=swap"
         rel="stylesheet">
@@ -141,6 +142,45 @@
             <button type="button" id="walkthrough-finish" hidden>Explore freely →</button>
         </aside>
 
+        <!-- Investment study: a dedicated library, separate from portfolio archives. -->
+        <div id="overlay-room-pitches" class="overlay hidden" data-dialog-label="Stock pitch library">
+            <div class="overlay-backdrop" data-close="room-pitches"></div>
+            <section class="pitch-panel">
+                <button type="button" class="overlay-close" data-close="room-pitches" aria-label="Close stock pitch library">×</button>
+                <p class="pitch-eyebrow">THE INVESTMENT STUDY</p>
+                <h2>Stock Pitch Library</h2>
+                <p class="pitch-intro">A collection of investment ideas, research, and stock-pitch presentations.</p>
+                <div id="pitch-filters" class="pitch-filters" hidden>
+                    <label>Find a pitch<input id="pitch-search" type="search" placeholder="Company, ticker, or theme…"></label>
+                    <label>Year<select id="pitch-year"><option value="">All years</option></select></label>
+                </div>
+                <p id="pitch-count" class="pitch-count" role="status"></p>
+                <div id="pitch-grid" class="pitch-grid"></div>
+                <div id="pitch-empty" class="pitch-empty">
+                    <span aria-hidden="true">▤</span>
+                    <h3 id="pitch-empty-title">The first pitch is on its way</h3>
+                    <p id="pitch-empty-copy">Stock-pitch presentations will be published here.</p>
+                    <button type="button" id="pitch-reset" hidden>Clear filters</button>
+                </div>
+            </section>
+        </div>
+        <div id="overlay-room-pitch" class="overlay hidden" data-dialog-label="Stock pitch presentation">
+            <div class="overlay-backdrop" data-close="room-pitch"></div>
+            <section class="pitch-panel pitch-viewer-panel">
+                <button type="button" class="overlay-close" data-close="room-pitch" aria-label="Close presentation">×</button>
+                <button type="button" id="pitch-back" class="pitch-back">← All stock pitches</button>
+                <h2 id="pitch-viewer-title"></h2>
+                <p id="pitch-viewer-meta" class="pitch-meta"></p>
+                <p id="pitch-viewer-summary"></p>
+                <div class="pitch-viewer-actions">
+                    <a id="pitch-download" download>Download PDF ↓</a>
+                    <a id="pitch-open" target="_blank" rel="noopener">Open PDF in a new tab ↗</a>
+                    <a id="pitch-slides" download hidden>Download original slides ↓</a>
+                </div>
+                <iframe id="pitch-viewer" title="Stock pitch presentation" loading="lazy"></iframe>
+            </section>
+        </div>
+
         <!-- Portfolio overlays -->
         <div id="overlay-skills" class="overlay hidden">
             <div class="overlay-backdrop" data-close="skills"></div>
@@ -199,10 +239,10 @@
                     <div class="skills-right">
                         <div class="resume-box">
                             <h3 class="resume-title">Resume</h3>
-                            <iframe id="resume-viewer" src="assets/resume.pdf#toolbar=0" 
+                            <iframe id="resume-viewer" src="assets/resume.pdf?v=5f0db435#toolbar=0"
                                 title="Susan Ho Resume"
                                 class="resume-embed"></iframe>
-                            <a href="assets/resume.pdf" download="Susan_Ho_Resume.pdf" class="resume-download-btn">
+                            <a href="assets/resume.pdf?v=5f0db435" download="Susan_Ho_Resume.pdf" class="resume-download-btn">
                                 📥 Download PDF
                             </a>
                         </div>
@@ -365,11 +405,13 @@
         <button class="touch-btn touch-jump" data-key="up" aria-label="Jump">↑</button>
     </div>
     <!-- Modular Game Engine Logic -->
-    <script src="js/setup.js?v=4"></script>
+    <script src="js/setup.js?v=5"></script>
     <script src="js/scene.js?v=3"></script>
-    <script src="js/input.js?v=4"></script>
-    <script src="js/explorer.js?v=2"></script>
-    <script src="js/walkthrough.js?v=1"></script>
+    <script src="js/input.js?v=5"></script>
+    <script src="js/explorer.js?v=3"></script>
+    <script src="js/walkthrough.js?v=2"></script>
+    <script src="js/stock-pitches.js?v=2"></script>
+    <script src="js/stock-pitch-room.js?v=2"></script>
     <script src="js/main.js?v=4"></script>
 </body>
 
