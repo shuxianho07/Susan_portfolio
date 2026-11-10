@@ -27,7 +27,7 @@ function setupScene(sceneName) {
     const { w, h } = viewportSize();
 
     // Clear existing world decorations
-    worldEl.querySelectorAll('.hotspot-marker, .door-marker, .ground-outside, .ground-inside, .ground-commonroom, .torch, .castle-decor, .greeting-text, .instruction-text, .common-room-door-btn').forEach(el => el.remove());
+    worldEl.querySelectorAll('.hotspot-marker, .door-marker, .ground-outside, .ground-inside, .ground-commonroom, .torch, .castle-decor, .greeting-text, .instruction-text').forEach(el => el.remove());
 
     if (sceneName === 'outside') {
         worldW = Math.max(w, h * 1.77); // Ensure it fills the screen width at minimum
@@ -91,22 +91,10 @@ function setupScene(sceneName) {
         // Add torches
         addInsideDecorations();
 
-        // Add a visible Common Room door button on the far right
-        const commonRoomBtn = document.createElement('button');
-        commonRoomBtn.type = 'button';
-        commonRoomBtn.className = 'common-room-door-btn';
-        commonRoomBtn.innerHTML = `🚪 Common Room`;
-        commonRoomBtn.style.right = '0px';
-        commonRoomBtn.style.bottom = (CONFIG.physics.groundOffsetInside + 120) + 'px';
-        commonRoomBtn.addEventListener('click', () => {
-            if (!overlayOpen && !sceneTransitioning) enterCommonRoom();
-        });
-        worldEl.appendChild(commonRoomBtn);
-
         // Update back button label for corridor
         backButton.textContent = '⬅ Back Outside';
 
-        // Hide interact button inside the corridor — hotspot icons serve as interaction feedback
+        // The shared proximity prompt supports keyboard, click, and touch input.
         interactBtn.classList.add('inside-scene');
 
         CONFIG.inside.hotspots.forEach(hs => {

@@ -199,12 +199,12 @@ function updateInteractions() {
             interactBtn.textContent = '⬅ Exit to Grounds ⏎';
             positionInteractButton(exitX + 60, getGroundY() - CONFIG.character.height);
         }
-        if (charX >= worldW * 0.9) {
+        if (charX >= worldW * 0.9 - CONFIG.inside.hotspotRadius) {
             canInteract = true;
             currentInteraction = 'commonRoom';
             show(interactBtn);
             interactBtn.textContent = 'Enter Common Room ⏎';
-            positionInteractButton(worldW * 0.9, getGroundY() - CONFIG.character.height);
+            positionInteractButton(worldW * 0.9, getGroundY() - 80);
         }
 
         // Check hotspot proximity
