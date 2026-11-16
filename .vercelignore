@@ -3,3 +3,8 @@ node_modules/
 .env.local
 .vercel
 fallback-app/node_modules/
+
+# Keep editable stock-pitch templates out of the public site.
+assets/stock-pitches/*.pptx
+assets/stock-pitches/*.ppt
+assets/stock-pitches/*.potx

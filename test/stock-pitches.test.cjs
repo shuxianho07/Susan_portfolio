@@ -6,20 +6,17 @@ const vm = require('node:vm');
 const root = path.resolve(__dirname, '..');
 const catalog = vm.runInNewContext(`${fs.readFileSync(path.join(root, 'js/stock-pitches.js'), 'utf8')}\nSTOCK_PITCHES`);
 
-test('published pitches have unique identities and valid local PDF/PPTX assets', () => {
+test('published pitches have unique identities and valid viewing PDFs', () => {
   assert.ok(catalog.length > 0, 'the published library must contain decks');
   const ids = new Set();
   for (const pitch of catalog) {
     assert.equal(ids.has(pitch.id), false, `duplicate pitch: ${pitch.id}`);
     ids.add(pitch.id);
     assert.ok(pitch.title && pitch.company && pitch.ticker && pitch.summary);
-    for (const [field, extension, signature] of [['pdf', '.pdf', '%PDF-'], ['slides', '.pptx', 'PK']]) {
-      assert.match(pitch[field], /^\/assets\/stock-pitches\/[a-z0-9-]+\.(pdf|pptx)$/);
-      assert.equal(path.extname(pitch[field]), extension);
-      const content = fs.readFileSync(path.join(root, pitch[field]));
-      assert.ok(content.length > 1000, `${pitch.id} ${field} must not be empty`);
-      assert.equal(content.subarray(0, signature.length).toString(), signature);
-    }
+    assert.match(pitch.pdf, /^\/assets\/stock-pitches\/[a-z0-9-]+\.pdf$/);
+    const content = fs.readFileSync(path.join(root, pitch.pdf));
+    assert.ok(content.length > 1000, `${pitch.id} PDF must not be empty`);
+    assert.equal(content.subarray(0, 5).toString(), '%PDF-');
   }
 });
 
@@ -43,5 +40,21 @@ test('each gallery exhibit has an accessible label and a valid painted WebP asse
     const image = fs.readFileSync(path.join(root, pitch.art));
     assert.equal(image.subarray(0, 4).toString(), 'RIFF');
     assert.equal(image.subarray(8, 12).toString(), 'WEBP');
+  }
+});
+
+
+test('stock-pitch downloads and editable sources are not exposed by the site', () => {
+  const html = fs.readFileSync(path.join(root, 'index.html'), 'utf8');
+  const viewer = html.slice(html.indexOf('id="overlay-room-pitch"'), html.indexOf('<!-- Portfolio overlays -->'));
+  assert.doesNotMatch(viewer, /\bdownload(?:\s|=|>)/i);
+  assert.doesNotMatch(html, /id="pitch-(?:download|open|slides)"/);
+  assert.match(html, /id="resume-viewer"/);
+  assert.match(html, /class="resume-download-btn"/);
+  for (const pitch of catalog) assert.equal(Object.hasOwn(pitch, 'slides'), false);
+  const files = fs.readdirSync(path.join(root, 'assets/stock-pitches'));
+  assert.equal(files.some(name => /\.(pptx?|potx)$/i.test(name)), false);
+  for (const file of ['.gitignore', '.vercelignore']) {
+    assert.ok(fs.readFileSync(path.join(root, file), 'utf8').includes('assets/stock-pitches/*.pptx'));
   }
 });

@@ -28,15 +28,14 @@
 .pitch-card h3 { font: 21px/1.4 'Cinzel', Georgia, serif; color: #e1cb92; margin: 8px 0 12px; }
 .pitch-card > p:not(.pitch-meta) { color: #bec8b9; font-size: 14px; flex: 1; margin-bottom: 22px; }
 .pitch-meta { color: #aeb9a7; font-size: 12px; }
-.pitch-panel :is(button:not(.overlay-close), .pitch-viewer-actions a) { min-height: 44px; padding: 10px 14px; border: 1px solid #a18c5870; border-radius: 5px; color: #e1cb92; background: #bda66b0a; text-decoration: none; font: 14px/1.5 'Outfit', system-ui, sans-serif; cursor: pointer; }
-.pitch-panel :is(button:not(.overlay-close), .pitch-viewer-actions a):hover { background: #bda66b20; }
+.pitch-panel button:not(.overlay-close) { min-height: 44px; padding: 10px 14px; border: 1px solid #a18c5870; border-radius: 5px; color: #e1cb92; background: #bda66b0a; text-decoration: none; font: 14px/1.5 'Outfit', system-ui, sans-serif; cursor: pointer; }
+.pitch-panel button:not(.overlay-close):hover { background: #bda66b20; }
 .pitch-empty { border: 1px dashed #a18c5850; border-radius: 8px; text-align: center; padding: 48px 24px; margin-top: 16px; }
 .pitch-empty > span { display: inline-grid; place-items: center; width: 64px; height: 64px; border: 1px solid #a18c5870; border-radius: 50%; font-size: 32px; color: #bda66b; margin-bottom: 20px; }
 .pitch-empty h3 { font: 22px/1.4 'Cinzel', Georgia, serif; color: #e1cb92; margin-bottom: 10px; }
 .pitch-empty p { color: #aeb9a7; }
 .pitch-empty button { margin-top: 20px; }
 .pitch-viewer-panel .pitch-back { border: 0 !important; padding-left: 0 !important; margin-bottom: 18px; }
-.pitch-viewer-actions { display: flex; flex-wrap: wrap; gap: 12px; margin: 20px 0; }
 .pitch-viewer-panel iframe { width: 100%; height: 55dvh; min-height: 260px; border: 1px solid #a18c5860; background: #e8e1cb; border-radius: 4px; }
 @media (max-width: 640px) {
     .overlay .pitch-panel { width: calc(100vw - 32px); max-height: calc(100dvh - 40px); padding: 26px 20px; }

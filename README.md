@@ -177,7 +177,7 @@ The game runs on port 8000; the React development app uses `/quick-links/` on po
 npm test
 ```
 
-First-time visitors receive a skippable interactive walkthrough: move, jump, enter the castle, open a glowing object, close its archive, and open the field guide. Steps advance only after the visitor performs each action; the game stays playable throughout. The field guide can replay it and tracks the four portfolio sections locally in the browser. The corridor holds the four portfolio archives. The Common Room is a dedicated stock-pitch presentation library with search, year filters, an embedded PDF reader, and downloads. The Flywire, CME Group, Uranium Energy Corp., and Teva decks are listed in `js/stock-pitches.js`, with PDF previews and original PowerPoint downloads.
+First-time visitors receive a skippable interactive walkthrough: move, jump, enter the castle, open a glowing object, close its archive, and open the field guide. Steps advance only after the visitor performs each action; the game stays playable throughout. The field guide can replay it and tracks the four portfolio sections locally in the browser. The corridor holds the four portfolio archives. The Common Room is a dedicated stock-pitch presentation library with search, year filters, an embedded PDF reader. The Flywire, CME Group, Uranium Energy Corp., and Teva decks are listed in `js/stock-pitches.js`, with in-site PDF previews.
 
 The optional live chatbot needs a Vercel-compatible runtime, a server-side `GEMINI_API_KEY`, and access to `generativelanguage.googleapis.com`. The local frontend falls back to answers derived from repository content when the API is unavailable. Do not put API keys in frontend files.
 
@@ -262,10 +262,15 @@ Place presentation PDFs under `assets/stock-pitches/` and add their metadata to
 `js/stock-pitches.js`. Each entry uses `id`, `title`, `company`, `ticker`, `date`
 (YYYY-MM-DD, when explicitly stated), `summary`, and `pdf` (a site-relative URL).
 Use `asOf` instead of `date` when only a data cutoff is given; omit both when no
-date is stated. Optional `slides` links to the original PowerPoint file. Publish only decks and research supplied by Susan;
-do not invent companies, theses, returns, or competition results. PDF exports preserve slide counts; original `.pptx` downloads preserve the supplied
-files unchanged. When adding or replacing decks, check PDF page counts and visual
-layout, then verify the reader and download links.
+date is stated. Publish only decks and research supplied by Susan; do not invent
+companies, theses, returns, or competition results. Keep editable PowerPoint
+sources outside this repository and deployment. The public catalog must not expose
+source-deck URLs or download/open-in-new-tab controls. Résumé downloads are separate
+and remain available.
+
+PDF previews are still public browser-readable files. Removing download controls
+does not prevent saving, screenshots, or access to files in old GitHub commits or
+historical deployments. Do not describe this viewer as copy protection.
 
 ### Illustrated gallery
 
