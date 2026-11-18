@@ -5,3 +5,8 @@ dist/
 .env
 .env.local
 quick-links/
+
+# Keep editable stock-pitch templates out of the public site.
+assets/stock-pitches/*.pptx
+assets/stock-pitches/*.ppt
+assets/stock-pitches/*.potx

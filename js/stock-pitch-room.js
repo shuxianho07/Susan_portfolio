@@ -31,13 +31,6 @@ function renderStockPitch(pitch) {
     const frame = document.getElementById('pitch-viewer');
     frame.src = `${pdf.split('#')[0]}#toolbar=0`;
     frame.title = `${pitch.title} presentation`;
-    document.getElementById('pitch-download').href = pdf;
-    document.getElementById('pitch-open').href = pdf;
-    const slides = document.getElementById('pitch-slides');
-    const slidesUrl = pitchUrl(pitch.slides);
-    slides.hidden = !slidesUrl;
-    if (slidesUrl) slides.href = slidesUrl;
-    else slides.removeAttribute('href');
     return true;
 }
 function openStockPitch(pitch) {
